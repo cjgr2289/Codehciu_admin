@@ -1,0 +1,1 @@
+[2025-09-25T16:45:13+02:00] [DBERR68d5557932f4b7.24028504] RemoteAddr: ::1 URI: /admin/api/auth.php Payload: {"email":"administrador@codehciu.org","password":"220389"}

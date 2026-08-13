@@ -1,0 +1,119 @@
+<form id="user-form" enctype="multipart/form-data">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="user-name">Nombre Completo:</label>
+            <input type="text" id="user-name" name="nombre" required>
+        </div>
+
+        <div class="form-group">
+            <label for="user-email">Email:</label>
+            <input type="email" id="user-email" name="email" required>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="user-password">Contraseña:</label>
+            <input type="password" id="user-password" name="password" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="user-phone">Teléfono:</label>
+            <input type="tel" id="user-phone" name="telefono" pattern="04[0-9]{9}" maxlength="11" required>
+            <small>Formato: 04 seguido de 9 dígitos (11 dígitos total)</small>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="user-photo">Foto (PNG/JPG):</label>
+            <input type="file" id="user-photo" name="foto" accept=".png,.jpg,.jpeg">
+            <small>Solo se aceptan imágenes PNG o JPG (max. 2MB)</small>
+            <div id="photo-preview" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="user-expiration">Fecha de Vencimiento Carnet:</label>
+            <input type="date" id="user-expiration" name="fecha_vencimiento" min="<?= date('Y-m-d') ?>" required>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="user-cedula">Cédula:</label>
+            <input type="text" id="user-cedula" name="cedula" pattern="[VEve]\d+" required>
+            <small>Formato: V o E seguido de números (ej: V12345678)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="user-blood-type">Tipo de Sangre:</label>
+            <select id="user-blood-type" name="TipoSangre">
+                <option value="">Seleccionar</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="user-allergies">Alergias:</label>
+            <textarea id="user-allergies" name="alergias" rows="3" placeholder="Lista de alergias separadas por coma"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="user-medicines">Medicinas:</label>
+            <textarea id="user-medicines" name="medicinas" rows="3" placeholder="Medicamentos que toma regularmente"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="user-role">Rol:</label>
+        <select id="user-role" name="rol" required>
+            <option value="regular">Regular</option>
+            <option value="editor">Editor</option>
+            <option value="socio">Socio</option>
+            <option value="contab">Administración</option>
+            <option value="coord">Coordinador</option>
+            <option value="directivo">Directivo</option>
+            <option value="admin">Administrador</option>
+        </select>
+    </div>
+
+        <div class="form-group">
+            <label for="user-position">Cargo:</label>
+            <input type="text" id="user-position" name="cargo" required>
+        </div>
+
+    <div class="form-group">
+        <label for="user-department">Área/Departamento:</label>
+        <input type="text" id="user-department" name="departamento" required>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group checkbox-group">
+            <label for="user-active">
+                <input type="checkbox" id="user-active" name="Activo" checked>
+                Usuario Activo
+            </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label for="user-change-password">
+                <input type="checkbox" id="user-change-password" name="debe_cambiar_password" checked>
+                El usuario debe cambiar la contraseña al primer inicio
+            </label>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn">Guardar Usuario</button>
+        <button type="button" id="cancel-user-form" class="btn cancel">Cancelar</button>
+    </div>
+</form>

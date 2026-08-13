@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzas - CODEHCIU</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/control-flujo.css">
+    <link rel="stylesheet" href="css/politicas-modal.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="shortcut icon" href="css/favicon.ico" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- lib de reportes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+
+</head>
+
+<body>
+
+    <!-- Botón para menú móvil -->
+    <button id="menuToggle" class="menu-toggle d-md-none">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay para cerrar menú -->
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar existente - asegúrate que tenga id="sidebar" -->
+    <aside id="sidebar" class="sidebar">
+        <!-- Tu contenido del sidebar aquí -->
+    </aside>
+
+    <!-- Cargar navbar dinámicamente -->
+    <div id="navbar-container"></div>
+
+    <!-- Contenedor para el modal de políticas -->
+    <div id="politicas-modal-container"></div>
+
+    <!-- Contenido principal -->
+    <main class="main-content control-flujo-container">
+        <!-- Sección de lista de proyectos -->
+        <div id="lista-proyectos">
+            <div class="header-section">
+                <h1><i class="fas fa-chart-line"></i> Finanzas - Proyectos</h1>
+                <div class="action-buttons">
+                    <button class="btn btn-primary btn-flujo btn-roles" id="btn-crear-proyecto">
+                        <i class="fas fa-plus"></i> Crear Proyecto
+                    </button>
+                    <button class="btn btn-success btn-flujo btn-roles" id="btn-crear-cuenta">
+                        <i class="fas fa-university"></i> Cuentas Bancarias
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestañas para proyectos abiertos/cerrados -->
+            <div class="tabs-container">
+                <ul class="nav nav-tabs" id="proyectoTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active tab-indicator" id="abiertos-tab" data-bs-toggle="tab"
+                            data-bs-target="#abiertos" type="button" role="tab">
+                            <i class="fas fa-folder-open"></i> Proyectos Abiertos
+                            <span class="badge bg-success ml-2" id="contador-abiertos">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link tab-indicator" id="cerrados-tab" data-bs-toggle="tab"
+                            data-bs-target="#cerrados" type="button" role="tab">
+                            <i class="fas fa-folder"></i> Proyectos Cerrados
+                            <span class="badge bg-secondary ml-2" id="contador-cerrados">0</span>
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3" id="proyectoTabContent">
+                    <!-- Proyectos Abiertos -->
+                    <div class="tab-pane fade show active" id="abiertos" role="tabpanel">
+                        <div class="alert alert-success mb-3">
+                            <i class="fas fa-unlock"></i> <strong>Proyectos Activos</strong> - Puedes realizar registros
+                            en estos proyectos.
+                        </div>
+                        <div class="table-responsive">
+                            <table class="tabla-proyectos">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Fecha Inicio</th>
+                                        <th>Fecha Fin</th>
+                                        <th>Status</th>
+                                        <th>Disponibilidad Tiempo</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="proyectos-abiertos">
+                                    <tr>
+                                        <td colspan="7" class="text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                            <p class="mt-2">Cargando proyectos abiertos...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Proyectos Cerrados -->
+                    <div class="tab-pane fade" id="cerrados" role="tabpanel">
+                        <div class="alert alert-secondary mb-3">
+                            <i class="fas fa-lock"></i> <strong>Proyectos Finalizados</strong> - Solo lectura. Para
+                            hacer cambios, reabre el proyecto.
+                        </div>
+                        <div class="table-responsive">
+                            <table class="tabla-proyectos">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Fecha Inicio</th>
+                                        <th>Fecha Fin</th>
+                                        <th>Status</th>
+                                        <th>Disponibilidad Tiempo</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="proyectos-cerrados">
+                                    <tr>
+                                        <td colspan="7" class="text-center">
+                                            <div class="spinner-border text-secondary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                            <p class="mt-2">Cargando proyectos cerrados...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de cuentas bancarias -->
+            <div class="cuentas-resumen mt-5">
+                <h3><i class="fas fa-university"></i> Resumen de Cuentas Bancarias</h3>
+                <div id="resumen-cuentas">
+                    <div class="text-center">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-2">Cargando información de cuentas...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- DASHBOARD HEADER - BOTONES DE ACCIÓN - (oculto inicialmente)  -->
+        <!-- ========================================== -->
+        <div class="dashboard-header mb-4">
+            <button class="btn btn-secondary" id="btn-volver-listado">
+                <i class="fas fa-arrow-left"></i> Volver al Listado
+            </button>
+            <h2 id="titulo-dashboard">Dashboard del Proyecto</h2>
+            <div class="proyecto-actions">
+                <!-- Botones existentes -->
+                <button class="btn btn-warning btn-roles" id="btn-crear-partida">
+                    <i class="fas fa-plus-circle"></i> Crear Partida
+                </button>
+                <button class="btn btn-dark" id="btn-generar-reporte">
+                    <i class="fas fa-file-download"></i> Generar Reporte
+                </button>
+                <button class="btn btn-info btn-roles" id="btn-registrar-ingreso">
+                    <i class="fas fa-money-bill-wave"></i> Registrar Abono
+                </button>
+                <button class="btn btn-warning btn-flujo" id="btn-solicitudes-compras">
+                    <i class="fas fa-shopping-cart"></i> Solicitudes de Compras
+                </button>
+                <!-- ✅ NUEVO BOTÓN SOLICITUDES DE PAGOS -->
+                <button class="btn btn-success btn-flujo" id="btn-solicitudes-pagos">
+                    <i class="fas fa-hand-holding-usd"></i> Solicitudes de Pagos
+                </button>
+            </div>
+        </div>
+
+            <!-- ========================================== -->
+            <!-- BOTÓN FLOTANTE (FAB)                       -->
+            <!-- ========================================== -->
+            <div class="fab-container" id="fabContainer">
+                <div class="fab-options">
+                    <button class="fab-option" id="fab-crear-partida">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Crear Partida</span>
+                    </button>
+                    <button class="fab-option" id="fab-generar-reporte">
+                        <i class="fas fa-file-download"></i>
+                        <span>Generar Reporte</span>
+                    </button>
+                    <button class="fab-option" id="fab-registrar-ingreso">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Registrar Abono</span>
+                    </button>
+                    <button class="fab-option" id="fab-registrar-egreso">
+                        <i class="fas fa-money-bill-wave-alt"></i>
+                        <span>Registrar Egreso</span>
+                    </button>
+                    <button class="fab-option" id="fab-solicitudes-compras">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Solicitudes de Compras</span>
+                    </button>
+                    <button class="fab-option" id="fab-solicitudes-pagos">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>Solicitudes de Pagos</span>
+                    </button>
+                </div>
+                <button class="fab-button" id="fabToggle">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+
+            <!-- Resumen financiero (mantener igual) -->
+            <div class="resumen-financiero">
+                <div class="resumen-item">
+                    <h4><i class="fas fa-money-bill-alt"></i> Presupuesto total del proyecto</h4>
+                    <div class="resumen-valor-container" id="presupuesto-total"></div>
+                    <div class="resumen-subtexto">Monto Total del proyecto (100%) menos el monto correspondiente a la
+                        ejecución (93%)</div>
+                </div>
+                <div class="resumen-item ingresos">
+                    <h4><i class="fas fa-arrow-down"></i> Abonos Recibidos</h4>
+                    <div class="resumen-valor text-success fs-5" id="abonos-recibidos">$0.00 (0%)</div>
+                    <div class="progress" style="height: 10px;">
+                        <div id="progreso-ingresos" class="progress-bar bg-success" style="width: 0%">0%</div>
+                    </div>
+                </div>
+                <div class="resumen-item gastos">
+                    <h4><i class="fa-solid fa-arrow-up" style="color: #ff0000;"></i> Gastos Realizados</h4>
+                    <div class="resumen-valor text-danger fs-5" id="gastos-realizados">$0.00 (0%)</div>
+                    <div class="progress" style="height: 10px;">
+                        <div id="progreso-egresos" class="progress-bar bg-danger" style="width: 0%">0%</div>
+                    </div>
+                </div>
+                <div class="resumen-item diferencia">
+                    <h4><i class="fas fa-calculator"></i> Saldo Disponible en caja</h4>
+                    <div class="resumen-valor text-success fs-5" id="saldo-neto">$0.00</div>
+                </div>
+                <div class="resumen-item cxc">
+                    <h4><i class="fa-solid fa-arrow-trend-up" style="color: #0056eb;"></i> Saldo por Cobrar</h4>
+                    <div class="resumen-valor fs-5 text-primary" id="cxc">$0.00 (0%)</div>
+                    <div class="progress" style="height: 10px;">
+                        <div id="progreso-cxc" class="progress-bar bg-warning" style="width: 0%">0%</div>
+                    </div>
+                </div>
+                <div class="resumen-item disponible">
+                    <h4><i class="fas fa-balance-scale"></i> Activos Liquidos</h4>
+                    <div class="resumen-valor fs-5" id="disponible-restante">$0.00 (0%)</div>
+                    <div class="progress" style="height: 10px;">
+                        <div id="progreso-disponible" class="progress-bar bg-warning" style="width: 0%">0%</div>
+                    </div>
+                </div>
+                <div class="resumen-item gastos-vs-abonos">
+                    <h4><i class="fas fa-percentage"></i> Gastos realizado frente al abono recibido</h4>
+                    <div class="resumen-valor text-danger fs-5" id="gastos-vs-abonos">$0.00 (0%)</div>
+                    <div class="progress" style="height: 10px;">
+                        <div id="progreso-gastos-vs-abonos" class="progress-bar bg-danger" style="width: 0%">0%</div>
+                    </div>
+                </div>
+                <div class="resumen-item psc">
+                    <h4>PSC COST.</h4>
+                    <div class="resumen-valor fs-5 text-info" id="psc">$0.00 (0%)</div>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="graficos-container"></div>
+
+            <!-- Historial de Ajustes -->
+            <div class="ajustes-section mt-5">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-history"></i> Historial de Ajustes de Presupuesto</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="ajustes-historial"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros de Partidas -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-light py-2">
+                            <h6 class="mb-0"><i class="fas fa-filter"></i> Filtros de Partidas</h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control form-control-sm" id="buscador-partidas"
+                                            placeholder="Buscar partidas...">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-select form-select-sm" id="filtro-estado-partidas">
+                                        <option value="">Todos los estados</option>
+                                        <option value="saludable">Saludable (&lt; 50% gastado)</option>
+                                        <option value="advertencia">Advertencia (50-75% gastado)</option>
+                                        <option value="peligro">Peligro (75-90% gastado)</option>
+                                        <option value="sobrepasado">Sobrepasado (&gt; 90% gastado)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-select form-select-sm" id="filtro-tipo-partidas">
+                                        <option value="">Todos los tipos</option>
+                                        <option value="Principal">Partidas Principales</option>
+                                        <option value="Secundaria">Partidas Secundarias</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de partidas -->
+            <div class="partidas-container">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3><i class="fas fa-list-alt"></i> Partidas del Proyecto</h3>
+                    <button class="btn btn-primary btn-sm btn-roles"
+                        onclick="window.controlFlujo.ui.mostrarModalCrearPartida()">
+                        <i class="fas fa-plus"></i> Nueva Partida
+                    </button>
+                </div>
+                <div id="lista-partidas" class="partidas-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODALES (todos los modales originales) -->
+
+
+    <!-- Modal: Crear Proyecto -->
+    <div class="modal fade modal-flujo" id="modal-crear-proyecto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Crear Nuevo Proyecto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-crear-proyecto">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="nombre" class="form-label">Nombre del Proyecto *</label>
+                                    <input type="text" id="nombre" name="nombre" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="cliente" class="form-label">Cliente</label>
+                                    <input type="text" id="cliente" name="cliente" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea id="descripcion" name="descripcion" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="fecha_inicio" class="form-label">Fecha de Inicio *</label>
+                                <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="fecha_fin" class="form-label">Fecha de Fin *</label>
+                                <input type="date" id="fecha_fin" name="fecha_fin" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="presupuesto" class="form-label">Presupuesto Total (USD) *</label>
+                            <input type="number" id="presupuesto" name="presupuesto" class="form-control" step="0.01"
+                                min="0" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar-proyecto">Crear Proyecto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Partida -->
+    <div class="modal fade" id="modal-crear-partida" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus-circle"></i> Crear Nueva Partida</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-crear-partida">
+                        <input type="hidden" id="proyecto_id_partida" name="proyecto_id" value="">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="tipo_partida"><i class="fas fa-tag"></i> Tipo de Partida *</label>
+                                <select class="form-control" id="tipo_partida" name="tipo_partida" required>
+                                    <option value="">Seleccionar tipo...</option>
+                                    <option value="Principal">Principal (Categoría)</option>
+                                    <option value="Secundaria">Secundaria (Subpartida)</option>
+                                </select>
+                                <small class="form-text text-muted">
+                                    Principal: Categoría que agrupa subpartidas<br>
+                                    Secundaria: Partida específica para registrar egresos
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="codigo_partida"><i class="fas fa-hashtag"></i> Código de Partida
+                                    *</label>
+                                <input type="text" class="form-control" id="codigo_partida" name="codigo_partida"
+                                    placeholder="Ej: P001, P001-001" required>
+                                <small class="form-text text-muted">Código único para identificar la partida</small>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3" id="partida-padre-group" style="display: none;">
+                            <label for="partida_padre">Partida Principal *</label>
+                            <select class="form-control" id="partida_padre" name="partida_padre_id">
+                                <option value="">Seleccionar partida principal...</option>
+                            </select>
+                            <div id="info-presupuesto-padre" class="mt-2"></div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="nombre_partida"><i class="fas fa-file-alt"></i> Nombre de la Partida *</label>
+                            <input type="text" class="form-control" id="nombre_partida" name="nombre_partida"
+                                placeholder="Ej: Materiales, Mano de obra, Equipos" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="descripcion_partida"><i class="fas fa-align-left"></i> Descripción</label>
+                            <textarea class="form-control" id="descripcion_partida" name="descripcion_partida" rows="3"
+                                placeholder="Descripción detallada de la partida..."></textarea>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="presupuesto_asignado"><i class="fas fa-money-bill-wave"></i> Presupuesto
+                                Asignado *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="presupuesto_asignado"
+                                    name="presupuesto_asignado" step="0.01" min="0.01" placeholder="0.00" required>
+                                <span class="input-group-text">USD</span>
+                            </div>
+                            <small class="form-text text-muted">
+                                Presupuesto inicial asignado a esta partida
+                                <span id="info-presupuesto-disponible" style="display: none;">
+                                    <!-- Se mostrará para subpartidas -->
+                                </span>
+                            </small>
+                        </div>
+                        <div class="alert alert-warning" id="alerta-principal" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i> Las partidas principales no permiten registrar
+                            egresos directamente.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar-partida">Crear Partida</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Registrar Ingreso/Abono -->
+    <div class="modal fade" id="modal-registrar-ingreso" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fas fa-money-bill-wave"></i> Registrar Abono/Ingreso al Proyecto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-registrar-ingreso">
+                        <input type="hidden" id="ingreso_proyecto_id" name="proyecto_id" value="">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="banco_ingreso" class="form-label">Cuenta Bancaria *</label>
+                                <select class="form-select" id="banco_ingreso" name="banco_id" required>
+                                    <option value="">Seleccionar cuenta...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="monto_ingreso" class="form-label">Monto en DÓLARES (USD) *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$ USD</span>
+                                    <input type="number" class="form-control" id="monto_ingreso" name="monto"
+                                        step="0.01" min="0.01" required placeholder="0.00">
+                                </div>
+                                <small class="form-text text-muted">Ingrese el monto en dólares americanos (USD)</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="moneda_ingreso" class="form-label">Moneda de Pago *</label>
+                                <select class="form-select" id="moneda_ingreso" name="moneda" required>
+                                    <option value="USD">🇺🇸 Dólar (USD) - Pago en dólares</option>
+                                    <option value="BS">🇻🇪 Bolívar (BS) - Pago en bolívares</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3" id="tasa-cambio-ingreso-container">
+                                <label for="tasa_cambio_ingreso" class="form-label">Tasa de Cambio (Bs por USD)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Bs / USD</span>
+                                    <input type="number" class="form-control" id="tasa_cambio_ingreso"
+                                        name="tasa_cambio" step="0.01" placeholder="Ej: 480.25" required>
+                                </div>
+                                <small class="form-text text-muted" id="conversion-ingreso-preview">🇻🇪 Monto
+                                    equivalente en bolívares: Bs 0.00</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="concepto_ingreso" class="form-label">Concepto *</label>
+                            <input type="text" class="form-control" id="concepto_ingreso" name="concepto" required
+                                placeholder="Ej: Abono inicial, Pago de factura...">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="referencia_ingreso" class="form-label">N° Referencia / Documento *</label>
+                                <input type="text" class="form-control" id="referencia_ingreso" name="referencia"
+                                    required placeholder="Ej: Transferencia #12345, FACT-001">
+                                <small class="form-text text-muted">Número de transferencia, factura o
+                                    comprobante</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="beneficiario_ingreso" class="form-label">Beneficiario / Pagador</label>
+                                <input type="text" class="form-control" id="beneficiario_ingreso" name="beneficiario"
+                                    placeholder="Ej: Cliente XYZ">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion_ingreso" class="form-label">Descripción (Opcional)</label>
+                            <textarea class="form-control" id="descripcion_ingreso" name="descripcion" rows="2"
+                                placeholder="Detalles adicionales..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fecha_ingreso" class="form-label">Fecha *</label>
+                            <input type="date" class="form-control" id="fecha_ingreso" name="fecha_transaccion"
+                                required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btn-registrar-abono">
+                        <i class="fas fa-check-circle"></i> Registrar Abono
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Registrar Egreso/Gasto -->
+    <div class="modal fade" id="modal-registrar-egreso" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-arrow-up"></i> Registrar Egreso/Gasto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-registrar-egreso">
+                        <input type="hidden" id="egreso_proyecto_id" name="proyecto_id" value="">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="partida_egreso" class="form-label">Partida *</label>
+                                <select id="partida_egreso" class="form-select" required>
+                                    <option value="">Seleccionar partida...</option>
+                                </select>
+                                <div id="info-tipo-partida" class="mt-1"></div>
+                                <div id="disponibilidad-partida" class="form-text"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="banco_egreso" class="form-label">Cuenta Bancaria *</label>
+                                <select id="banco_egreso" class="form-select" required>
+                                    <option value="">Seleccionar cuenta...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="monto_egreso" class="form-label">Monto en DÓLARES (USD) *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$ USD</span>
+                                    <input type="number" id="monto_egreso" class="form-control" step="0.01" min="0.01"
+                                        required placeholder="0.00">
+                                </div>
+                                <small class="form-text text-muted">Ingrese el monto en dólares americanos (USD)</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="moneda_egreso" class="form-label">Moneda de Pago *</label>
+                                <select id="moneda_egreso" class="form-select" required>
+                                    <option value="USD">🇺🇸 Dólar (USD)</option>
+                                    <option value="BS">🇻🇪 Bolívar (BS)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3" id="tasa-cambio-egreso-container">
+                                <label for="tasa_cambio_egreso" class="form-label">Tasa de Cambio (Bs por USD)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Bs / USD</span>
+                                    <input type="number" id="tasa_cambio_egreso" class="form-control" step="0.01"
+                                        placeholder="Ej: 480.25" required>
+                                </div>
+                                <small class="form-text text-muted" id="conversion-egreso-preview">🇻🇪 Monto
+                                    equivalente en bolívares: Bs 0.00</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion_egreso" class="form-label">Descripción / Concepto *</label>
+                            <input type="text" id="descripcion_egreso" class="form-control" required
+                                placeholder="Ej: Compra de materiales, Pago de servicios...">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="beneficiario_egreso" class="form-label">Beneficiario / Proveedor *</label>
+                                <input type="text" id="beneficiario_egreso" class="form-control" required
+                                    placeholder="Nombre de la persona o empresa">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="referencia_egreso" class="form-label">N° Factura / Documento / Referencia
+                                    *</label>
+                                <input type="text" id="referencia_egreso" class="form-control" required
+                                    placeholder="Ej: FACT-001, Recibo #123, Transferencia #ABC">
+                                <small class="form-text text-muted">Número de factura, recibo o comprobante de
+                                    pago</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="metodo_pago" class="form-label">Método de Pago *</label>
+                                <select id="metodo_pago" class="form-select" required>
+                                    <option value="Transferencia">💰 Transferencia Bancaria</option>
+                                    <option value="Efectivo">💵 Efectivo</option>
+                                    <option value="Cheque">📝 Cheque</option>
+                                    <option value="Tarjeta">💳 Tarjeta de Débito/Crédito</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fecha_egreso" class="form-label">Fecha *</label>
+                                <input type="date" id="fecha_egreso" class="form-control" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-registrar-egreso">
+                        <i class="fas fa-save"></i> Registrar Egreso
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Cuenta Bancaria -->
+    <div class="modal fade" id="modal-crear-cuenta" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">Gestión de Cuentas Bancarias</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="cuentaTabs" role="tablist">
+                        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab"
+                                data-bs-target="#crear-cuenta">Crear Cuenta</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                                data-bs-target="#lista-cuentas">Gestión de Cuentas</button></li>
+                    </ul>
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="crear-cuenta">
+                            <form id="form-crear-cuenta">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="nombre_banco">Nombre del Banco *</label>
+                                        <input type="text" id="nombre_banco" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="moneda_banco">Moneda *</label>
+                                        <select id="moneda_banco" class="form-control" required>
+                                            <option value="USD">Dólares (USD)</option>
+                                            <option value="BS">Bolívares (BS)</option>
+                                            <option value="EUR">Euros (EUR)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="pais_banco">País</label>
+                                        <input type="text" id="pais_banco" class="form-control"
+                                            placeholder="Ej: Venezuela">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="tipo_cuenta">Tipo de Cuenta</label>
+                                        <select id="tipo_cuenta" class="form-control">
+                                            <option value="Corriente">Corriente</option>
+                                            <option value="Ahorro">Ahorro</option>
+                                            <option value="Otros">Otros</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="representante_banco">Representante</label>
+                                        <input type="text" id="representante_banco" class="form-control"
+                                            placeholder="Nombre del representante">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email_representante">Email representante</label>
+                                        <input type="email" id="email_representante" class="form-control"
+                                            placeholder="email@dominio.com">
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="telefono_representante">Teléfono representante</label>
+                                        <input type="text" id="telefono_representante" class="form-control"
+                                            placeholder="Ej: +58 412-1234567">
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="numero_cuenta">Número de Cuenta *</label>
+                                    <input type="text" id="numero_cuenta" class="form-control" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="saldo_inicial">Saldo Inicial *</label>
+                                    <input type="number" id="saldo_inicial" class="form-control" step="0.01" value="0"
+                                        required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="lista-cuentas">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Banco</th>
+                                            <th>Cuenta</th>
+                                            <th>Moneda</th>
+                                            <th>Saldo</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-cuentas">
+                                        <tr>
+                                            <td colspan="5">Cargando...</td< /tr</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-info" id="btn-guardar-cuenta">Guardar Cuenta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Generar Reporte -->
+    <div class="modal fade" id="modal-generar-reporte" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <!-- HEADER -->
+                <div class="modal-header bg-dark text-white py-2">
+                    <h6 class="modal-title mb-0">
+                        <i class="fas fa-file-download me-2"></i> Generar Reporte del Proyecto
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body">
+
+                    <!-- Vista Previa -->
+                    <div class="text-center mb-3">
+                        <h6 class="text-primary mb-1">
+                            <i class="fas fa-chart-line me-1"></i> Vista Previa
+                        </h6>
+                        <p class="text-muted small mb-0">Resumen financiero del proyecto</p>
+                    </div>
+
+                    <!-- INFO PRINCIPAL -->
+                    <div class="mb-3">
+
+                        <div class="card info-card border-primary">
+                            <div class="info-icon bg-primary">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted">Proyecto</small>
+                                <div class="fw-bold" id="preview-nombre-proyecto">Cargando...</div>
+                            </div>
+                        </div>
+
+                        <!-- EXPORTACIÓN -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <button class="btn btn-success w-100 btn-sm" id="btn-descargar-excel">
+                                    <i class="fas fa-file-excel me-1"></i> Excel
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-danger w-100 btn-sm" id="btn-descargar-pdf">
+                                    <i class="fas fa-file-pdf me-1"></i> PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- INFO FINAL -->
+                        <div class="alert alert-info small py-2 mb-0">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Incluye resumen financiero, partidas y transacciones detalladas.
+                        </div>
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer">
+                        <small class="text-muted">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            <span id="fecha-actualizacion">Actualizando...</span>
+                        </small>
+                        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Cerrar
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <style>
+            /* Botón flotante */
+            .fab-container {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                z-index: 9999;
+            }
+
+            .fab-button {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background-color: #ffc107;
+                color: #212529;
+                border: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+
+            .fab-button:hover {
+                transform: scale(1.05);
+                background-color: #e0a800;
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            }
+
+            .fab-button i {
+                font-size: 24px;
+                transition: transform 0.3s ease;
+            }
+
+            .fab-container.open .fab-button i {
+                transform: rotate(45deg);
+            }
+
+            .fab-options {
+                position: absolute;
+                bottom: 70px;
+                right: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                visibility: hidden;
+                opacity: 0;
+                transition: all 0.3s ease;
+            }
+
+            .fab-container.open .fab-options {
+                visibility: visible;
+                opacity: 1;
+                bottom: 75px;
+            }
+
+            .fab-option {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: white;
+                padding: 8px 16px 8px 12px;
+                border-radius: 40px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                white-space: nowrap;
+                font-size: 14px;
+                font-weight: 500;
+                color: #333;
+                border: none;
+            }
+
+            .fab-option:hover {
+                transform: translateX(-5px);
+                background-color: #f8f9fa;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+
+            .fab-option i {
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                font-size: 16px;
+            }
+
+            .fab-option i.fa-plus-circle {
+                background: #ffc107;
+                color: #212529;
+            }
+
+            .fab-option i.fa-file-download {
+                background: #343a40;
+                color: white;
+            }
+
+            .fab-option i.fa-money-bill-wave {
+                background: #0dcaf0;
+                color: white;
+            }
+
+            .fab-option i.fa-shopping-cart {
+                background: #ffc107;
+                color: #212529;
+            }
+
+            @media (max-width: 768px) {
+                .fab-container {
+                    bottom: 20px;
+                    right: 20px;
+                }
+
+                .fab-button {
+                    width: 50px;
+                    height: 50px;
+                }
+
+                .fab-button i {
+                    font-size: 20px;
+                }
+            }
+        </style>
+        <!-- Estilos CSS adicionales -->
+        <style>
+            .modal-content {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .modal-body {
+                flex: 1 1 auto;
+                padding: 1rem;
+            }
+
+            .modal-footer {
+                padding: .5rem 1rem;
+                background: #fff;
+                border-top: 1px solid #dee2e6;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .card {
+                border-radius: 6px;
+                border-left: 4px solid;
+                padding: .6rem .75rem;
+                margin-bottom: .5rem;
+            }
+
+            .info-card {
+                display: flex;
+                gap: .75rem;
+                align-items: center;
+            }
+
+            .info-icon {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+            }
+
+            .finance-card {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: .6rem .75rem;
+            }
+
+            .modal-body>*:last-child {
+                margin-bottom: 0 !important;
+            }
+        </style>
+
+
+        <script>
+
+            // Función para limpiar todos los botones btn-roles en la página
+            function limpiarTodosBotonesRoles() {
+                const userData = localStorage.getItem('user');
+                if (!userData) return;
+
+                try {
+                    const user = JSON.parse(userData);
+                    const roleLower = user.role.toLowerCase();
+                    const rolesPermitidos = ['admin', 'administrador', 'contab', 'contador'];
+
+                    if (!rolesPermitidos.includes(roleLower)) {
+                        // Ocultar TODOS los botones btn-roles en toda la página
+                        const todosBotones = document.querySelectorAll('button.btn-roles');
+
+                        todosBotones.forEach(boton => {
+                            // Solo ocultar si no está ya oculto
+                            if (boton.style.display !== 'none') {
+                                boton.style.display = 'none';
+                                boton.disabled = true;
+                                boton.setAttribute('data-original-display', 'inline-block'); // Guardar estado original
+                            }
+                        });
+
+                        console.log(`Ocultados ${todosBotones.length} botones para rol: ${roleLower}`);
+                    }
+                } catch (error) {
+                    console.error('Error al limpiar botones:', error);
+                }
+            }
+
+            // Ejecutar cuando se cargue la página
+            document.addEventListener('DOMContentLoaded', function () {
+                // Ejecutar después de un breve delay para asegurar que todo esté cargado
+                setTimeout(limpiarTodosBotonesRoles, 500);
+
+                // También ejecutar cada vez que haya cambios en el DOM
+                const observer = new MutationObserver(function (mutations) {
+                    let hayCambios = false;
+                    mutations.forEach(function (mutation) {
+                        if (mutation.addedNodes.length > 0) {
+                            hayCambios = true;
+                        }
+                    });
+
+                    if (hayCambios) {
+                        setTimeout(limpiarTodosBotonesRoles, 100);
+                    }
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+
+                // También ejecutar cuando se cambie entre pestañas o vistas
+                document.addEventListener('click', function (e) {
+                    // Si se hace clic en cualquier botón de pestaña o navegación
+                    if (e.target.closest('[data-bs-toggle="tab"], .nav-link, .btn-volver')) {
+                        setTimeout(limpiarTodosBotonesRoles, 300);
+                    }
+                });
+            });
+        </script>
+
+
+
+        <!-- Modal Transaccion Banco -->
+        <div class="modal fade" id="modal-transaccion-banco" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Transacción Bancaria</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="form-transaccion-banco">
+                        <div class="modal-body">
+                            <input type="hidden" id="transaccion_tipo" value="">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="cuenta_origen">Cuenta Origen *</label>
+                                    <select class="form-control" id="cuenta_origen" required>
+                                        <option value="">Seleccionar cuenta...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 mb-3" id="cuenta-destino-group" style="display: none;">
+                                    <label for="cuenta_destino">Cuenta Destino *</label>
+                                    <select class="form-control" id="cuenta_destino">
+                                        <option value="">Seleccionar cuenta destino...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="monto_transaccion">Monto *</label>
+                                    <input type="number" class="form-control" id="monto_transaccion" step="0.01"
+                                        min="0.01" required>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label for="concepto_transaccion">Concepto *</label>
+                                    <input type="text" class="form-control" id="concepto_transaccion" required>
+                                </div>
+                                <div class="col-md-12 mb-3" id="beneficiario-group" style="display: none;">
+                                    <label for="beneficiario_transaccion">Beneficiario *</label>
+                                    <input type="text" class="form-control" id="beneficiario_transaccion">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="fecha_transaccion">Fecha</label>
+                                    <input type="date" class="form-control" id="fecha_transaccion">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" id="btn-guardar-transaccion">Guardar
+                                Transacción</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Scripts -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script src="js/session-validator.js"></script>
+ 
+        <script>
+           
+            // ============================================
+            // BOTÓN FLOTANTE (FAB) - Control por rol
+            // ============================================
+            (function () {
+                const fabContainer = document.getElementById('fabContainer');
+                const fabToggle = document.getElementById('fabToggle');
+
+                function actualizarFABPorRol() {
+                    const userData = localStorage.getItem('user');
+                    if (!userData) return;
+                    try {
+                        const user = JSON.parse(userData);
+                        const role = user.role ? user.role.toLowerCase() : '';
+                        const fabCrearPartida = document.getElementById('fab-crear-partida');
+                        const fabGenerarReporte = document.getElementById('fab-generar-reporte');
+                        const fabRegistrarIngreso = document.getElementById('fab-registrar-ingreso');
+                        const fabRegistrarEgreso = document.getElementById('fab-registrar-egreso');
+                        const fabSolicitudesCompras = document.getElementById('fab-solicitudes-compras');
+                        const allFabButtons = [fabCrearPartida, fabGenerarReporte, fabRegistrarIngreso, fabRegistrarEgreso, fabSolicitudesCompras];
+                        allFabButtons.forEach(btn => { if (btn) btn.style.display = 'none'; });
+
+                        if (role === 'admin' || role === 'administrador' || role === 'contab' || role === 'contador') {
+                            if (fabCrearPartida) fabCrearPartida.style.display = 'flex';
+                            if (fabGenerarReporte) fabGenerarReporte.style.display = 'flex';
+                            if (fabRegistrarIngreso) fabRegistrarIngreso.style.display = 'flex';
+                            if (fabRegistrarEgreso) fabRegistrarEgreso.style.display = 'flex';
+                            if (fabSolicitudesCompras) fabSolicitudesCompras.style.display = 'flex';
+                        } else if (role === 'directivo') {
+                            if (fabGenerarReporte) fabGenerarReporte.style.display = 'flex';
+                        } else if (role === 'coord' || role === 'coordinador') {
+                            if (fabGenerarReporte) fabGenerarReporte.style.display = 'flex';
+                            if (fabSolicitudesCompras) fabSolicitudesCompras.style.display = 'flex';
+                        } else if (role === 'socio') {
+                            if (fabGenerarReporte) fabGenerarReporte.style.display = 'flex';
+                        }
+                    } catch (error) {
+                        console.error('Error actualizando FAB por rol:', error);
+                    }
+                }
+
+                if (fabToggle) {
+                    fabToggle.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        fabContainer.classList.toggle('open');
+                    });
+                    document.addEventListener('click', function (e) {
+                        if (!fabContainer.contains(e.target)) {
+                            fabContainer.classList.remove('open');
+                        }
+                    });
+                }
+
+                function conectarBotonesFAB() {
+                    const fabCrearPartida = document.getElementById('fab-crear-partida');
+                    const fabGenerarReporte = document.getElementById('fab-generar-reporte');
+                    const fabRegistrarIngreso = document.getElementById('fab-registrar-ingreso');
+                    const fabSolicitudesCompras = document.getElementById('fab-solicitudes-compras');
+                    const fabRegistrarEgreso = document.getElementById('fab-registrar-egreso');
+
+                    if (fabCrearPartida) {
+                        fabCrearPartida.addEventListener('click', function () {
+                            if (typeof window.controlFlujo !== 'undefined' && window.controlFlujo.ui) {
+                                window.controlFlujo.ui.mostrarModalCrearPartida();
+                            }
+                            fabContainer.classList.remove('open');
+                        });
+                    }
+                    if (fabRegistrarEgreso) {
+                        fabRegistrarEgreso.addEventListener('click', function () {
+                            if (typeof window.controlFlujo !== 'undefined' && window.controlFlujo.ui) {
+                                window.controlFlujo.ui.mostrarModalRegistrarEgreso();
+                            }
+                            fabContainer.classList.remove('open');
+                        });
+                    }
+                    if (fabGenerarReporte) {
+                        fabGenerarReporte.addEventListener('click', function () {
+                            const btn = document.getElementById('btn-generar-reporte');
+                            if (btn) btn.click();
+                            fabContainer.classList.remove('open');
+                        });
+                    }
+                    if (fabRegistrarIngreso) {
+                        fabRegistrarIngreso.addEventListener('click', function () {
+                            const btn = document.getElementById('btn-registrar-ingreso');
+                            if (btn) btn.click();
+                            fabContainer.classList.remove('open');
+                        });
+                    }
+                    if (fabSolicitudesCompras) {
+                        fabSolicitudesCompras.addEventListener('click', function () {
+                            const btn = document.getElementById('btn-solicitudes-compras');
+                            if (btn) btn.click();
+                            fabContainer.classList.remove('open');
+                        });
+                    }
+                }
+
+                actualizarFABPorRol();
+                conectarBotonesFAB();
+                window.addEventListener('storage', function (e) {
+                    if (e.key === 'user') actualizarFABPorRol();
+                });
+                const observerFAB = new MutationObserver(function () {
+                    actualizarFABPorRol();
+                    conectarBotonesFAB();
+                });
+                observerFAB.observe(document.body, { childList: true, subtree: true });
+            })();
+
+            // ============================================
+                // BOTÓN SOLICITUDES DE PAGOS - CONTROL FLUJO
+                // ============================================
+                (function () {
+                    // Esperar a que el DOM esté listo
+                    document.addEventListener('DOMContentLoaded', function () {
+                        configurarBotonSolicitudesPagos();
+                        configurarFABSolicitudesPagos();
+                    });
+
+                    // Configurar botón en el dashboard
+                    function configurarBotonSolicitudesPagos() {
+                        const btn = document.getElementById('btn-solicitudes-pagos');
+                        if (btn) {
+                            // Eliminar eventos anteriores para evitar duplicados
+                            const newBtn = btn.cloneNode(true);
+                            btn.parentNode.replaceChild(newBtn, btn);
+
+                            newBtn.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                redirigirASolicitudesPagos();
+                            });
+                        }
+                    }
+
+                    // Configurar botón en el FAB
+                    function configurarFABSolicitudesPagos() {
+                        const fabBtn = document.getElementById('fab-solicitudes-pagos');
+                        if (fabBtn) {
+                            const newFabBtn = fabBtn.cloneNode(true);
+                            fabBtn.parentNode.replaceChild(newFabBtn, fabBtn);
+
+                            newFabBtn.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                redirigirASolicitudesPagos();
+                                // Cerrar el FAB después de hacer clic
+                                const fabContainer = document.getElementById('fabContainer');
+                                if (fabContainer) fabContainer.classList.remove('open');
+                            });
+                        }
+                    }
+
+                    /**
+                     * Función para redirigir a Solicitudes de Pagos
+                     * Obtiene el proyecto actual y redirige con el ID
+                     */
+                    function redirigirASolicitudesPagos() {
+                        let proyectoId = null;
+
+                        // 1. Intentar obtener de window.proyectoActualId (variable global)
+                        if (typeof window.proyectoActualId !== 'undefined' && window.proyectoActualId) {
+                            proyectoId = window.proyectoActualId;
+                        }
+
+                        // 2. Intentar obtener del título del dashboard
+                        if (!proyectoId) {
+                            const titulo = document.getElementById('titulo-dashboard')?.textContent;
+                            if (titulo) {
+                                const match = titulo.match(/(?:ID|#)[:\s]*(\d+)/i);
+                                if (match) proyectoId = match[1];
+                            }
+                        }
+
+                        // 3. Intentar obtener de localStorage
+                        if (!proyectoId) {
+                            proyectoId = localStorage.getItem('proyecto_actual_pagos');
+                        }
+
+                        if (!proyectoId) {
+                            proyectoId = localStorage.getItem('proyecto_actual');
+                        }
+
+                        // 4. Intentar obtener de sessionStorage
+                        if (!proyectoId) {
+                            proyectoId = sessionStorage.getItem('proyecto_actual');
+                        }
+
+                        // 5. Si aún no hay proyecto, mostrar error
+                        if (!proyectoId) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Sin proyecto seleccionado',
+                                text: 'No se pudo identificar el proyecto actual. Por favor, selecciona un proyecto primero.',
+                                confirmButtonText: 'Entendido'
+                            });
+                            return;
+                        }
+
+                        // Guardar el proyecto en todos los lugares para asegurar consistencia
+                        localStorage.setItem('proyecto_actual_pagos', proyectoId);
+                        localStorage.setItem('proyecto_actual', proyectoId);
+                        sessionStorage.setItem('proyecto_actual', proyectoId);
+
+                        // Redirigir a solicitudes-pagos.html con el proyecto_id
+                        window.location.href = 'solicitudes-pagos.html?proyecto_id=' + proyectoId;
+                    }
+
+                    // Exponer la función globalmente
+                    window.redirigirASolicitudesPagos = redirigirASolicitudesPagos;
+                })();
+
+            // ============================================
+            // FUNCIONES AUXILIARES (navbar, botones, etc.)
+            // ============================================
+            function updateNavbarByRole(role) {
+                const noticiasItem = document.getElementById('noticias-item');
+                const finanzasItem = document.getElementById('finanzas-item');
+                const credencialesItem = document.getElementById('credenciales-item');
+                const politicasItem = document.getElementById('politicas-item');
+                const correoItem = document.getElementById('correo-item');
+                const usuariosItem = document.getElementById('usuarios-item');
+                const userInfoItem = document.getElementById('user-info-item');
+                const logoutItem = document.getElementById('logout-item');
+
+                if (noticiasItem) noticiasItem.style.display = 'none';
+                if (finanzasItem) finanzasItem.style.display = 'none';
+                if (credencialesItem) credencialesItem.style.display = 'none';
+                if (politicasItem) politicasItem.style.display = 'none';
+                if (correoItem) correoItem.style.display = 'none';
+                if (usuariosItem) usuariosItem.style.display = 'none';
+                if (userInfoItem) userInfoItem.style.display = 'list-item';
+                if (logoutItem) logoutItem.style.display = 'list-item';
+
+                const roleLower = role.toLowerCase();
+                switch (roleLower) {
+                    case 'admin':
+                    case 'administrador':
+                        if (noticiasItem) noticiasItem.style.display = 'list-item';
+                        if (finanzasItem) finanzasItem.style.display = 'list-item';
+                        if (credencialesItem) credencialesItem.style.display = 'list-item';
+                        if (politicasItem) politicasItem.style.display = 'list-item';
+                        if (correoItem) correoItem.style.display = 'list-item';
+                        if (usuariosItem) usuariosItem.style.display = 'list-item';
+                        break;
+                    case 'editor':
+                        if (noticiasItem) noticiasItem.style.display = 'list-item';
+                        if (credencialesItem) credencialesItem.style.display = 'list-item';
+                        if (politicasItem) politicasItem.style.display = 'list-item';
+                        if (correoItem) correoItem.style.display = 'list-item';
+                        break;
+                    case 'contab':
+                    case 'contador':
+                        if (finanzasItem) finanzasItem.style.display = 'list-item';
+                        if (credencialesItem) credencialesItem.style.display = 'list-item';
+                        if (politicasItem) politicasItem.style.display = 'list-item';
+                        if (correoItem) correoItem.style.display = 'list-item';
+                        break;
+                    case 'coord':
+                    case 'coordinador':
+                        if (finanzasItem) finanzasItem.style.display = 'list-item';
+                        if (credencialesItem) credencialesItem.style.display = 'list-item';
+                        if (politicasItem) politicasItem.style.display = 'list-item';
+                        if (correoItem) correoItem.style.display = 'list-item';
+                        break;
+                    case 'socio':
+                        if (finanzasItem) finanzasItem.style.display = 'list-item';
+                        if (politicasItem) politicasItem.style.display = 'list-item';
+                        break;
+                    case 'directivo':
+                        if (noticiasItem) noticiasItem.style.display = 'list-item';
+                        if (finanzasItem) finanzasItem.style.display = 'list-item';
+                        if (credencialesItem) credencialesItem.style.display = 'list-item';
+                        if (politicasItem) politicasItem.style.display = 'list-item';
+                        if (correoItem) correoItem.style.display = 'list-item';
+                        break;
+                    case 'regular':
+                        if (credencialesItem) credencialesItem.style.display = 'list-item';
+                        if (politicasItem) politicasItem.style.display = 'list-item';
+                        if (correoItem) correoItem.style.display = 'list-item';
+                        break;
+                    default:
+                        if (credencialesItem) credencialesItem.style.display = 'list-item';
+                        if (politicasItem) politicasItem.style.display = 'list-item';
+                        if (correoItem) correoItem.style.display = 'list-item';
+                        break;
+                }
+            }
+
+            function controlarModalesPorRol(role) {
+                const rolesPermitidos = ['admin', 'administrador', 'contab', 'contador'];
+                if (!rolesPermitidos.includes(role)) {
+                    const modalBotonIds = [
+                        'btn-guardar-partida',
+                        'btn-registrar-abono',
+                        'btn-registrar-egreso',
+                        'btn-guardar-cuenta',
+                        'btn-guardar-transaccion'
+                    ];
+                    modalBotonIds.forEach(id => {
+                        const boton = document.getElementById(id);
+                        if (boton) {
+                            boton.disabled = true;
+                            boton.title = "Acceso restringido para su rol";
+                        }
+                    });
+                }
+            }
+
+            function controlarResumenCuentasPorRol(role) {
+                const rolesPermitidos = ['admin', 'administrador', 'directivo', 'contab', 'contador'];
+                const cuentaResumen = document.querySelector('.cuentas-resumen');
+                if (cuentaResumen) {
+                    cuentaResumen.style.display = rolesPermitidos.includes(role) ? 'block' : 'none';
+                }
+            }
+
+            function controlarBotonesPorRol(role) {
+                const roleLower = role.toLowerCase();
+                const rolesPermitidos = ['admin', 'administrador', 'contab', 'contador'];
+                const botones = document.querySelectorAll('.btn-roles');
+                if (rolesPermitidos.includes(roleLower)) {
+                    botones.forEach(boton => {
+                        boton.style.display = 'inline-block';
+                        boton.disabled = false;
+                        boton.removeAttribute('title');
+                    });
+                } else {
+                    botones.forEach(boton => { boton.style.display = 'none'; });
+                    const botonesEspecificosIds = [
+                        'btn-crear-proyecto',
+                        'btn-crear-cuenta',
+                        'btn-crear-partida',
+                        'btn-registrar-ingreso'
+                    ];
+                    botonesEspecificosIds.forEach(id => {
+                        const boton = document.getElementById(id);
+                        if (boton) boton.style.display = 'none';
+                    });
+                }
+                controlarModalesPorRol(roleLower);
+                controlarResumenCuentasPorRol(roleLower);
+            }
+
+            // ============================================
+            // INICIALIZACIÓN PRINCIPAL CON VALIDACIÓN DE SESIÓN
+            // ============================================
+            document.addEventListener('DOMContentLoaded', async function () {
+                const rolesPermitidos = [
+                    'admin', 'administrador',
+                    'editor',
+                    'contab', 'contador',
+                    'directivo',
+                    'coord', 'coordinador',
+                    'socio',
+                    'regular'
+                ];
+
+                let user;
+                try {
+                    user = await validateSession(rolesPermitidos);
+                    if (!user) return; // validateSession ya redirige si falla
+                } catch (error) {
+                    console.error('Error durante validación de sesión:', error);
+                    localStorage.removeItem('user');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                try {
+                    const response = await fetch('navbar.html');
+                    if (!response.ok) throw new Error('Error cargando navbar');
+                    const html = await response.text();
+                    document.getElementById('navbar-container').innerHTML = html;
+
+                    initializeNavbar(user);
+
+                    setTimeout(() => {
+                        if (typeof initResponsiveMenu === 'function') initResponsiveMenu();
+                    }, 100);
+                } catch (error) {
+                    console.error('Error cargando navbar:', error);
+                    document.getElementById('navbar-container').innerHTML = `
+                        <header class="admin-header">
+                            <a href="inicio.html" class="logo-link">
+                                <img src="css/LOGO.png" alt="LOGO CODEHCIU" class="header-logo">
+                            </a>
+                            <p>Control de Flujo</p>
+                            <div class="user-info">
+                                <button class="nav-btn" onclick="window.location.href='inicio.html'">
+                                    <i class="fas fa-home"></i> Inicio
+                                </button>
+                            </div>
+                        </header>
+                    `;
+                    initializeNavbar(user);
+                }
+            });
+
+            // ============================================
+            // FUNCIÓN PRINCIPAL initializeNavbar (recibe user)
+            // ============================================
+            function initializeNavbar(user) {
+                const usernameElement = document.getElementById('username');
+                if (usernameElement) usernameElement.textContent = user.name;
+
+                updateNavbarByRole(user.role);
+                controlarBotonesPorRol(user.role);
+
+                // Esperar a que controlFlujo esté disponible antes de cargar proyectos
+                let intentos = 0;
+                const esperarControlFlujo = setInterval(() => {
+                    if (typeof controlFlujo !== 'undefined' && controlFlujo.cargarProyectos) {
+                        clearInterval(esperarControlFlujo);
+                        controlFlujo.cargarProyectos();
+                    }
+                    intentos++;
+                    if (intentos > 30) { // 30 * 200ms = 6 segundos
+                        clearInterval(esperarControlFlujo);
+                        console.warn('No se pudo cargar controlFlujo.cargarProyectos');
+                        
+                    }
+                }, 200);
+
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function () {
+                        Swal.fire({
+                            title: '¿Cerrar sesión?',
+                            text: '¿Estás seguro de que quieres salir del sistema?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Sí, cerrar sesión',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                localStorage.removeItem('user');
+                                window.location.href = 'index.html';
+                            }
+                        });
+                    });
+                }
+
+                const politicasLink = document.getElementById('ver-politicas-link');
+                if (politicasLink) {
+                    politicasLink.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const politicasModal = document.getElementById('politicasModal');
+                        if (politicasModal && typeof window.initPoliticasModal === 'function') {
+                            politicasModal.style.display = 'block';
+                        }
+                    });
+                }
+
+                if (typeof initResponsiveMenu === 'function') initResponsiveMenu();
+            }
+
+            // ============================================
+            // EVENTO GLOBAL PARA VER PROYECTOS
+            // ============================================
+            document.addEventListener('click', function (e) {
+                let verProyectoBtn = e.target.closest('.btn-ver-proyecto, [data-proyecto-id]');
+                if (!verProyectoBtn && e.target.hasAttribute('data-proyecto-id')) verProyectoBtn = e.target;
+                if (!verProyectoBtn && e.target.closest('i.fa-eye')) verProyectoBtn = e.target.closest('button');
+                if (verProyectoBtn && verProyectoBtn.dataset.proyectoId) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    let proyectoId = verProyectoBtn.dataset.proyectoId;
+                    if (!proyectoId && verProyectoBtn.onclick) {
+                        const onclickStr = verProyectoBtn.onclick.toString();
+                        const match = onclickStr.match(/cargarProyecto\s*\(\s*(\d+)\s*\)/);
+                        if (match) proyectoId = match[1];
+                    }
+                    if (proyectoId) {
+                        if (typeof controlFlujo !== 'undefined' && controlFlujo.cargarProyecto) {
+                            controlFlujo.cargarProyecto(proyectoId);
+                        } else if (typeof window.mostrarDashboardProyectoDirecto === 'function') {
+                            window.mostrarDashboardProyectoDirecto(proyectoId);
+                        }
+                    }
+                }
+            });
+
+            // ============================================
+            // FUNCIÓN GLOBAL PARA CARGAR PARTIDAS PRINCIPALES
+            // ============================================
+            window.cargarPartidasPrincipales = async function (proyectoId) {
+                console.log('Cargando partidas principales para proyecto:', proyectoId);
+                const partidaPadreSelect = document.getElementById('partida_padre');
+                if (!partidaPadreSelect) return;
+                if (!proyectoId) {
+                    partidaPadreSelect.innerHTML = '<option value="">Error: No se especificó proyecto</option>';
+                    return;
+                }
+                partidaPadreSelect.innerHTML = '<option value="">Cargando partidas principales...</option>';
+                partidaPadreSelect.disabled = true;
+                try {
+                    const response = await fetch(`./api/partidas.php?action=listar-principales&proyecto_id=${proyectoId}`);
+                    const data = await response.json();
+                    if (data.success && data.partidas && data.partidas.length > 0) {
+                        partidaPadreSelect.innerHTML = '<option value="">Seleccionar partida principal...</option>';
+                        data.partidas.forEach(partida => {
+                            const option = document.createElement('option');
+                            option.value = partida.id;
+                            const presupuesto = parseFloat(partida.presupuesto_asignado || 0);
+                            const disponible = parseFloat(partida.disponible_real || presupuesto);
+                            option.textContent = `${partida.codigo} - ${partida.nombre} ($${presupuesto.toLocaleString()} | Disponible: $${disponible.toLocaleString()})`;
+                            option.dataset.presupuesto = presupuesto;
+                            option.dataset.disponible = disponible;
+                            partidaPadreSelect.appendChild(option);
+                        });
+                        partidaPadreSelect.disabled = false;
+                        partidaPadreSelect.onchange = function () {
+                            const selectedOption = this.options[this.selectedIndex];
+                            const infoPresupuestoPadre = document.getElementById('info-presupuesto-padre');
+                            if (infoPresupuestoPadre && selectedOption && selectedOption.value) {
+                                infoPresupuestoPadre.innerHTML = `
+                                    <div class="alert alert-info alert-sm py-1 px-2 mb-0 mt-2">
+                                        <i class="fas fa-info-circle"></i>
+                                        Presupuesto: $${parseFloat(selectedOption.dataset.presupuesto || 0).toLocaleString()} | 
+                                        Disponible: $${parseFloat(selectedOption.dataset.disponible || 0).toLocaleString()}
+                                    </div>
+                                `;
+                            }
+                        };
+                    } else {
+                        partidaPadreSelect.innerHTML = '<option value="">No hay partidas principales disponibles</option>';
+                        partidaPadreSelect.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    partidaPadreSelect.innerHTML = '<option value="">Error al cargar partidas</option>';
+                    partidaPadreSelect.disabled = false;
+                }
+            };
+
+            // ============================================
+            // LIMPIEZA DEL MODAL DE PARTIDAS
+            // ============================================
+            document.addEventListener('DOMContentLoaded', function () {
+                const modalCrearPartida = document.getElementById('modal-crear-partida');
+                if (modalCrearPartida) {
+                    modalCrearPartida.addEventListener('hidden.bs.modal', function () {
+                        const form = document.getElementById('form-crear-partida');
+                        if (form) form.reset();
+                        const tipoPartida = document.getElementById('tipo_partida');
+                        const partidaPadreGroup = document.getElementById('partida-padre-group');
+                        const partidaPadreSelect = document.getElementById('partida_padre');
+                        const alertaPrincipal = document.getElementById('alerta-principal');
+                        const infoPresupuestoPadre = document.getElementById('info-presupuesto-padre');
+                        if (tipoPartida) tipoPartida.value = 'Principal';
+                        if (partidaPadreGroup) partidaPadreGroup.style.display = 'none';
+                        if (alertaPrincipal) alertaPrincipal.style.display = 'none';
+                        if (partidaPadreSelect) partidaPadreSelect.innerHTML = '<option value="">Seleccionar partida principal...</option>';
+                        if (infoPresupuestoPadre) infoPresupuestoPadre.innerHTML = '';
+                    });
+                    modalCrearPartida.addEventListener('show.bs.modal', function () {
+                        const partidaPadreGroup = document.getElementById('partida-padre-group');
+                        const tipoPartida = document.getElementById('tipo_partida');
+                        const partidaPadreSelect = document.getElementById('partida_padre');
+                        const infoPresupuestoPadre = document.getElementById('info-presupuesto-padre');
+                        if (partidaPadreGroup) partidaPadreGroup.style.display = 'none';
+                        if (tipoPartida) tipoPartida.value = 'Principal';
+                        if (partidaPadreSelect) partidaPadreSelect.innerHTML = '<option value="">Seleccionar partida principal...</option>';
+                        if (infoPresupuestoPadre) infoPresupuestoPadre.innerHTML = '';
+                    });
+                }
+            });
+
+            // ============================================
+            // BOTÓN SOLICITUDES DE COMPRAS
+            // ============================================
+            document.getElementById('btn-solicitudes-compras')?.addEventListener('click', function () {
+                let proyectoId = null;
+                if (typeof window.proyectoActualId !== 'undefined' && window.proyectoActualId) proyectoId = window.proyectoActualId;
+                if (!proyectoId) {
+                    const titulo = document.getElementById('titulo-dashboard')?.textContent;
+                    if (titulo) {
+                        const match = titulo.match(/(?:ID|#)[:\s]*(\d+)/i);
+                        if (match) proyectoId = match[1];
+                    }
+                }
+                if (!proyectoId) proyectoId = localStorage.getItem('proyecto_actual');
+                if (proyectoId) {
+                    localStorage.setItem('proyecto_actual', proyectoId);
+                    window.location.href = 'solicitudes-compras.html?proyecto_id=' + proyectoId;
+                } else {
+                    Swal.fire({ icon: 'warning', title: 'Sin proyecto', text: 'No se pudo identificar el proyecto actual.' });
+                }
+            });
+
+            // Función de diagnóstico (opcional)
+            window.diagnosticarPartidasAPI = async function (proyectoId) {
+                console.log('=== DIAGNÓSTICO ===');
+                try {
+                    const response = await fetch(`./api/partidas.php?action=listar-principales&proyecto_id=${proyectoId}`);
+                    const data = await response.json();
+                    console.log('Respuesta:', data);
+                } catch (e) {
+                    console.error('Error:', e);
+                }
+            };
+
+        </script>
+
+       <script src="js/politicas-modal.js"></script>
+        <script src="js/responsive.js"></script>
+        <script src="./js/proyectos-manager.js"></script>
+        <script src="./js/partidas-manager.js"></script>
+        <script src="./js/cuentas-manager.js"></script>
+        <script src="./js/transacciones-manager.js"></script>
+        <script src="./js/abonos-manager.js"></script>
+        <script src="./js/graficos-manager.js"></script>
+        <script src="./js/ajustes-manager.js"></script>
+        <script src="./js/cuentas-transacciones.js"></script>
+        <script src="./js/ui-manager.js"></script>
+        <script src="./js/control-flujo.js"></script>
+        <script src="js/reportes-manager.js"></script>
+</body>
+
+</html>

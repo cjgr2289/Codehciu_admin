@@ -1,0 +1,44 @@
+[25-Sep-2025 14:26:20 UTC] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:26:20 UTC] PHP Fatal error:  Uncaught Exception: Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES) in /home/oew7qmt0wk55/public_html/admin/api/database.php:38
+Stack trace:
+#0 /home/oew7qmt0wk55/public_html/admin/api/auth.php(3): require_once()
+#1 {main}
+  thrown in /home/oew7qmt0wk55/public_html/admin/api/database.php on line 38
+[25-Sep-2025 14:26:35 UTC] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:26:35 UTC] PHP Fatal error:  Uncaught Exception: Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES) in /home/oew7qmt0wk55/public_html/admin/api/database.php:38
+Stack trace:
+#0 /home/oew7qmt0wk55/public_html/admin/api/auth.php(3): require_once()
+#1 {main}
+  thrown in /home/oew7qmt0wk55/public_html/admin/api/database.php on line 38
+[25-Sep-2025 14:30:12 UTC] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:30:12 UTC] Database include error: Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:30:52 UTC] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:30:52 UTC] Database include error: Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:31:48 UTC] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:31:48 UTC] Database include error: Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:33:11 UTC] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:33:11 UTC] [ERR68d552a76ea8f2.97466473] Database include error: Database connection failed
+[25-Sep-2025 14:34:46 UTC] [DBERR68d55306d50887.82180395] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:34:46 UTC] [DBERR68d55306d50887.82180395] Database include failed (propagated to auth.php)
+[25-Sep-2025 14:37:48 UTC] [DBERR68d553bcdb45d6.19427178] [2025-09-25T14:37:48+00:00] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+[25-Sep-2025 14:37:48 UTC] [DBERR68d553bcdb45d6.19427178] Database include failed (propagated to auth.php)
+[25-Sep-2025 14:46:30 UTC] [2025-09-25T14:46:30+00:00] [DBERR68d555c611c446.86359543] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+DSN: 148.72.3.93 / DB: sistema_noticias
+PHP: 8.3.25 PDO error trace:
+#0 /home/oew7qmt0wk55/public_html/admin/api/database.php(28): PDO->__construct()
+#1 /home/oew7qmt0wk55/public_html/admin/api/auth.php(11): require_once('/home/oew7qmt0w...')
+#2 {main}
+
+
+[25-Sep-2025 14:46:30 UTC] [DBERR68d555c611c446.86359543] Database include failed (propagated to auth.php)
+[25-Sep-2025 14:49:05 UTC] [2025-09-25T14:49:05+00:00] [DBERR68d556615b2796.96108404] PDO error: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'p3plzcpnl509499.prod.phx3.secureserver.net' (using password: YES)
+DSN: 148.72.3.93 / DB: sistema_noticias / USER: cgomez
+HINT: Error 1045 - verifica usuario/contraseña y que el usuario tenga permiso desde el host del servidor web.
+      En muchos hostings el host de MySQL es 'localhost' y no la IP externa.
+PHP: 8.3.25 PDO error trace:
+#0 /home/oew7qmt0wk55/public_html/admin/api/database.php(28): PDO->__construct()
+#1 /home/oew7qmt0wk55/public_html/admin/api/auth.php(11): require_once('/home/oew7qmt0w...')
+#2 {main}
+
+
+[25-Sep-2025 14:49:05 UTC] [DBERR68d556615b2796.96108404] Database include failed (propagated to auth.php)

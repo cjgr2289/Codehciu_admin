@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación - CODEHCIU</title>
+    <!-- <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            max-width: 200px;
+            height: auto;
+        }
+        
+        /* Mensajes de estado */
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
+            text-align: center;
+        }
+        
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+            text-align: center;
+        }
+        
+        .warning-message {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #ffeeba;
+            text-align: center;
+        }
+        
+        /* Información de usuario */
+        .user-info {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .user-info p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        
+        .user-info strong {
+            display: inline-block;
+            width: 100px;
+        }
+        
+        /* Spinner de carga */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ec7b3a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsividad */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .user-info p {
+                font-size: 14px;
+            }
+            
+            .user-info strong {
+                width: 80px;
+            }
+        }
+    </style> -->
+    <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="shortcut icon" href="CSS/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="IMAGES/LOGO.png" alt="CODEHCIU Logo" class="logo">
+        </div>
+        <div id="verification-result">
+            <div class="warning-message">
+                <h2>Verificando información</h2>
+                <p>Estamos validando los datos, por favor espere...</p>
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const cedula = urlParams.get('cedula');
+            
+            const resultContainer = document.getElementById('verification-result');
+            
+            // Validar formato de cédula (puedes ajustar según tus necesidades)
+            const cedulaRegex = /^[VEve]\d{5,9}$/;
+            
+            if (!cedula) {
+                resultContainer.innerHTML = `
+                    <div class="error-message">
+                        <h2>Error: No se proporcionó número de cédula</h2>
+                        <p>Redireccionando a la página principal...</p>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    window.location.href = 'https://codehciu.org';
+                }, 3000);
+                return;
+            }
+            
+            if (!cedulaRegex.test(cedula)) {
+                resultContainer.innerHTML = `
+                    <div class="error-message">
+                        <h2>Error: Formato de cédula inválido</h2>
+                        <p>El formato debe ser V o E seguido de números (ej: V12345678)</p>
+                        <p><strong>Cédula proporcionada:</strong> ${cedula}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Consultar datos del usuario
+            fetch('api/verify_user.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({cedula: cedula})
+            })
+            .then(response => {
+                // Verificar si la respuesta es JSON válido
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        throw new Error(`Respuesta no JSON: ${text.substring(0, 100)}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.user) {
+                    const user = data.user;
+                    
+                    if (user.activo == 1) {
+                        Swal.fire({
+                            title: 'Verificación Exitosa',
+                            html: `
+                                <div style="text-align: center;">
+                                    <img src="IMAGES/LOGO.png" alt="CODEHCIU" style="width: 100px; margin-bottom: 20px;">
+                                    <h3>${user.nombre}</h3>
+                                    <p>Es un miembro activo de la organización</p>
+                                    <p><strong>Cédula:</strong> ${user.cedula}</p>
+                                    <p><strong>Cargo:</strong> ${user.cargo}</p>
+                                   <p style="margin-top: 20px; font-style: italic;">
+                                        <b>Se le acredita como miembro activo de la asociación civil sin fines de lucro "Comisión para los derechos Humanos y la Ciudadanía" CODEHCIU.</b>
+                                    </p>
+                                    <p>
+                                        Como miembro de la misma y como defensor/a de los derechos humanos de acuerdo con los estandares internacionales, se compromete a actuar con integridad, respeto y responsabilidad en todas sus acciones y decisiones.
+                                        Se agradece a las autoridades, organismos estadales, funcionarios publicos y otras ONGs prestarles colaboración y apoyo en el ejercicio de sus funciones, reconociendo la importante tarea que desarrollan y su valiosa contribución para la protección de los derechos y libertades fundamentales, de acuerdo con la Resolución AG/RES. 1910 del 10 de junio de 2003 de la ONU.
+                                    </p>
+                                </div>
+                            `,
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar',
+                            confirmButtonColor: '#ec7b3a'
+                        });
+                        
+                        resultContainer.innerHTML = `
+                            <div class="success-message">
+                                <h2>Verificación Exitosa</h2>
+                                <div class="user-info">
+                                    <p><strong>Nombre:</strong> ${user.nombre}</p>
+                                    <p><strong>Cédula:</strong> ${user.cedula}</p>
+                                    <p><strong>Cargo:</strong> ${user.cargo}</p>
+                                    <p><strong>Estado:</strong> Activo</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        resultContainer.innerHTML = `
+                            <div class="error-message">
+                                <h2>Usuario No Activo</h2>
+                                <p>El usuario no se encuentra activo en el sistema.</p>
+                                <div class="user-info">
+                                    <p><strong>Nombre:</strong> ${user.nombre}</p>
+                                    <p><strong>Cédula:</strong> ${user.cedula}</p>
+                                    <p><strong>Estado:</strong> Inactivo</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    resultContainer.innerHTML = `
+                        <div class="error-message">
+                            <h2>Usuario No Encontrado</h2>
+                            <p>No se encontró ningún usuario con la cédula proporcionada.</p>
+                            <p><strong>Cédula:</strong> ${cedula}</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error en la verificación:', error);
+                resultContainer.innerHTML = `
+                    <div class="error-message">
+                        <h2>Error en la verificación</h2>
+                        <p>Ocurrió un error al verificar la cédula. Por favor, intente nuevamente.</p>
+                        <p><strong>Detalles:</strong> ${error.message}</p>
+                    </div>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>

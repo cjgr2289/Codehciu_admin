@@ -1,0 +1,1435 @@
+/* ============================================
+   VARIABLES GLOBALES Y RESET
+   ============================================ */
+
+:root {
+    /* Colores principales */
+    --primary-color: #333;
+    --secondary-color: #007bff;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+
+    /* Colores de la navegación */
+    --nav-bg: #333;
+    --nav-text: white;
+    --nav-hover-bg: rgba(255, 255, 255, 0.1);
+    --nav-active-bg: rgba(255, 255, 255, 0.2);
+    --logout-hover-bg: #c82333;
+    --mobile-nav-bg: #333;
+    --overlay-bg: rgba(0, 0, 0, 0.5);
+
+    /* Colores de formularios */
+    --input-border: #ddd;
+    --input-bg: #fafafa;
+    --input-focus: #007bff;
+
+    /* Espaciado */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+
+    /* Bordes */
+    --border-radius-sm: 4px;
+    --border-radius-md: 6px;
+    --border-radius-lg: 10px;
+
+    /* Sombras */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Reset y estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================
+   BARRA DE NAVEGACIÓN - HEADER
+   ============================================ */
+
+/* Header principal */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 2rem;
+    background-color: var(--nav-bg);
+    color: var(--nav-text);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: var(--shadow-md);
+    height: 70px;
+}
+
+/* Logo en el header */
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    z-index: 1001;
+}
+
+.header-logo {
+    height: 40px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-link:hover .header-logo {
+    transform: scale(1.05);
+}
+
+/* Título del header */
+.admin-header>p {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font-weight: 500;
+    color: var(--nav-text);
+    font-size: 1.1rem;
+}
+
+/* Contenedor de usuario */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+/* Enlaces de navegación */
+.nav-container {
+    display: flex;
+    align-items: center;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.nav-menu li {
+    display: flex;
+    align-items: center;
+}
+
+.nav-link {
+    color: var(--nav-text) !important;
+    text-decoration: none !important;
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius-sm);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.95rem;
+}
+
+.nav-link:hover {
+    background-color: var(--nav-hover-bg);
+    color: var(--nav-text) !important;
+}
+
+.nav-link:active,
+.nav-link:focus {
+    background-color: var(--nav-active-bg);
+    outline: none;
+}
+
+.nav-link.active {
+    background-color: var(--nav-active-bg);
+}
+
+/* Nombre de usuario */
+#username {
+    color: var(--nav-text);
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 0.95rem;
+}
+
+/* Botón cerrar sesión */
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--nav-text) !important;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: var(--border-radius-sm);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none !important;
+}
+
+.nav-btn:hover {
+    background: var(--danger-color);
+    color: var(--nav-text) !important;
+}
+
+/* Botón hamburguesa */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.625rem;
+    z-index: 1001;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.hamburger {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: var(--nav-text);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.hamburger::before,
+.hamburger::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--nav-text);
+    transition: all 0.3s ease;
+    left: 0;
+}
+
+.hamburger::before {
+    top: -8px;
+}
+
+.hamburger::after {
+    top: 8px;
+}
+
+/* Estado activo del botón hamburguesa */
+.menu-toggle.active .hamburger {
+    background: transparent;
+}
+
+.menu-toggle.active .hamburger::before {
+    top: 0;
+    transform: rotate(45deg);
+}
+
+.menu-toggle.active .hamburger::after {
+    top: 0;
+    transform: rotate(-45deg);
+}
+
+/* Overlay para móvil */
+.nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--overlay-bg);
+    z-index: 998;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* ============================================
+   CONTENIDO PRINCIPAL
+   ============================================ */
+
+.main-content {
+    flex: 1;
+    margin-top: 70px;
+    /* Compensar header fijo */
+    padding: var(--spacing-lg);
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Contenedores principales */
+.admin-container,
+.editor-container {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Contenedor específico del editor */
+.editor-container {
+    max-width: 700px;
+    margin: var(--spacing-xl) auto;
+    width: 90%;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+
+/* Estructura del formulario */
+#news-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+/* Grupos de formulario */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+    color: #444;
+    font-size: 0.95rem;
+}
+
+/* Elementos de formulario */
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="file"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-md);
+    font-family: inherit;
+    font-size: 1rem;
+    background: var(--input-bg);
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Vista previa de imagen */
+.image-preview {
+    margin: var(--spacing-md) auto;
+    text-align: center;
+    max-width: 100%;
+}
+
+#preview-img {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: var(--border-radius-md);
+    display: none;
+    margin: 0 auto;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-md);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+/* Botones principales */
+.btn-primary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Botones secundarios */
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Botones de éxito */
+.btn-success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Botones de peligro */
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: var(--logout-hover-bg);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Botones de advertencia */
+.btn-warning {
+    background-color: var(--warning-color);
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Botón cancelar */
+.btn.cancel {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn.cancel:hover {
+    background: #bdbdbd;
+    transform: translateY(-2px);
+}
+
+/* Botones grandes */
+.btn-large {
+    padding: 1.25rem 2rem;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.btn-large i {
+    font-size: 2rem;
+}
+
+/* Botones con iconos */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius-md);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    gap: 0.375rem;
+    min-width: 80px;
+}
+
+.btn-icon i {
+    font-size: 1rem;
+}
+
+/* Botón añadir noticia */
+#add-news-btn {
+    margin-bottom: var(--spacing-lg);
+    background: var(--success-color);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem 1.125rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#add-news-btn:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Acciones de formulario */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+/* ============================================
+   LISTA DE NOTICIAS
+   ============================================ */
+
+.news-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.news-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.news-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--secondary-color);
+}
+
+.news-card h3 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.25rem;
+    color: #333;
+    line-height: 1.4;
+}
+
+.news-card p {
+    margin: 0;
+    color: #555;
+    line-height: 1.6;
+}
+
+.news-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.news-thumb {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: var(--border-radius-md);
+    background: #eee;
+    flex-shrink: 0;
+}
+
+.news-actions {
+    margin-top: var(--spacing-md);
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* ============================================
+   TABLAS
+   ============================================ */
+
+.users-table-container {
+    width: 100%;
+    max-width: 95%;
+    margin: var(--spacing-lg) auto;
+    overflow-x: auto;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid #e0e0e0;
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.users-table th {
+    background: var(--light-color);
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    padding: 0.875rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.users-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+}
+
+.users-table tr:nth-child(even) {
+    background: #fcfcfc;
+}
+
+.users-table tr:hover {
+    background: #f5f9ff;
+    transition: background 0.2s ease;
+}
+
+/* ============================================
+   PÁGINA DE INICIO
+   ============================================ */
+
+.inicio-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 150px);
+    background-color: white;
+}
+
+.inicio-container {
+    text-align: center;
+    max-width: 800px;
+    padding: var(--spacing-xl);
+}
+
+.inicio-logo {
+    max-width: 300px;
+    margin-bottom: var(--spacing-xl);
+}
+
+.inicio-container h1 {
+    color: #333;
+    margin-bottom: var(--spacing-md);
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.inicio-container p {
+    color: #666;
+    margin-bottom: var(--spacing-xl);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.inicio-welcome {
+    background-color: var(--light-color);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    margin-top: var(--spacing-xl);
+    border-left: 4px solid var(--secondary-color);
+}
+
+.inicio-welcome h2 {
+    color: #333;
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.5rem;
+}
+
+.inicio-welcome p {
+    color: var(--secondary-color);
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+/* ============================================
+   CONTROL DE FLUJO
+   ============================================ */
+
+.control-flujo-info {
+    background-color: var(--light-color);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.control-flujo-info p {
+    margin-bottom: var(--spacing-md);
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.control-flujo-info ul {
+    list-style-type: disc;
+    margin-left: 2rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.control-flujo-info li {
+    margin-bottom: var(--spacing-sm);
+    color: #555;
+    line-height: 1.6;
+}
+
+.coming-soon {
+    background-color: white;
+    border: 2px dashed var(--secondary-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+    margin-top: var(--spacing-xl);
+    text-align: center;
+}
+
+.coming-soon h3 {
+    color: var(--secondary-color);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.3rem;
+}
+
+.coming-soon h3 i {
+    font-size: 1.5rem;
+}
+
+.suggestions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.suggestion-card {
+    background-color: #f0f8ff;
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #e1f0ff;
+}
+
+.suggestion-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--secondary-color);
+}
+
+.suggestion-card i {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.suggestion-card h4 {
+    color: #333;
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.1rem;
+}
+
+.suggestion-card p {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* ============================================
+   CREDENCIALES
+   ============================================ */
+
+/* SweetAlert2: Proyectos modal responsive */
+.swal-proyectos-wrapper {
+    text-align: left;
+    max-width: 100%;
+}
+.swal-proyectos-toolbar {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+.swal-asignar-btn {
+    padding: 0.5rem 0.75rem;
+}
+.swal-proyectos-list { list-style: none; padding: 0; margin: 0; }
+.swal-proyectos-list li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 6px; border-bottom: 1px solid #eee; }
+.proyecto-nombre { font-weight: 600; margin-right: 8px; }
+.proyecto-rol { margin-left: 8px; color: #666; font-size: 0.9em; }
+.proyecto-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-small { background: var(--secondary-color); color: #fff; border: none; padding: 6px 8px; border-radius: 4px; cursor: pointer; }
+.btn-small.secondary { background: #6c757d; }
+
+/* Assign modal row: allow selects to wrap and be full-width on small viewports */
+.swal-assign-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.swal-assign-row .swal2-select { flex: 1 1 200px; min-width: 140px; box-sizing: border-box; }
+
+/* Make SweetAlert content not force horizontal scroll */
+.swal2-popup { box-sizing: border-box; max-width: 95% !important; }
+.swal2-html-container { overflow-wrap: break-word; }
+
+/* Edit role modal layout */
+.swal-edit-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.swal-edit-label { min-width: 70px; font-weight: 600; }
+
+.credentials-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+#preview-container {
+    background: #f9f9f9;
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    border: 1px solid #ddd;
+    margin-top: var(--spacing-lg);
+}
+
+#preview-content {
+    min-height: 200px;
+    border: 1px dashed #ccc;
+    padding: var(--spacing-md);
+    background: white;
+    border-radius: var(--border-radius-sm);
+}
+
+/* ============================================
+   LOGIN
+   ============================================ */
+
+.login-container {
+    max-width: 400px;
+    margin: 80px auto 0 auto;
+    padding: 2rem;
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+}
+
+.login-container img {
+    max-width: 150px;
+    height: auto;
+    margin-bottom: var(--spacing-lg);
+}
+
+.login-container h1 {
+    margin-bottom: var(--spacing-lg);
+    font-size: 1.6rem;
+    color: var(--primary-color);
+    text-align: center;
+    font-weight: 600;
+}
+
+#login-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+#login-form .form-group {
+    margin-bottom: 0;
+}
+
+#login-form label {
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+    color: #444;
+    font-size: 0.95rem;
+}
+
+#login-form input[type="email"],
+#login-form input[type="password"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-md);
+    font-size: 1rem;
+    font-family: inherit;
+    background: var(--input-bg);
+}
+
+#login-form .btn {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+    padding: 0.75rem;
+    font-size: 1rem;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+footer {
+    width: 100%;
+    background: #f5f5f5;
+    color: #666;
+    text-align: center;
+    padding: 1.125rem 0.625rem 0.75rem 0.625rem;
+    font-size: 1rem;
+    border-top: 1px solid #e0e0e0;
+    margin-top: auto;
+}
+
+footer p {
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   NOTIFICACIONES Y MENSAJES
+   ============================================ */
+
+.error-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--danger-color);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    animation: slide-in 0.3s ease-out;
+    max-width: 90%;
+    text-align: center;
+}
+
+.error-toast.fade-out {
+    animation: fade-out 0.5s ease-out forwards;
+}
+
+@keyframes slide-in {
+    from {
+        bottom: -50px;
+        opacity: 0;
+    }
+
+    to {
+        bottom: 20px;
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   RESPONSIVE - TABLETS (769px - 1024px)
+   ============================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .admin-header {
+        padding: 0.8rem 1.5rem;
+    }
+
+    .nav-menu {
+        gap: 0.5rem;
+    }
+
+    .nav-link,
+    #username,
+    .nav-btn {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.9rem;
+    }
+
+    .header-logo {
+        height: 38px;
+    }
+
+    .admin-container,
+    .editor-container {
+        padding: var(--spacing-lg);
+        margin: 80px auto 30px auto;
+    }
+
+    .inicio-container {
+        padding: var(--spacing-lg);
+    }
+}
+
+/* ============================================
+   RESPONSIVE - MÓVILES (max-width: 768px)
+   ============================================ */
+
+@media (max-width: 768px) {
+
+    /* Header */
+    .admin-header {
+        padding: 0.8rem 1rem;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 60px;
+    }
+
+    .admin-header>p {
+        display: none;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+
+    .header-logo {
+        height: 35px;
+    }
+
+    /* Navegación móvil - OCULTA POR DEFECTO */
+    .nav-container {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 280px;
+        height: 100vh;
+        background: var(--mobile-nav-bg);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 80px 0 0 0;
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+        overflow-y: auto;
+        display: none;  /* IMPORTANTE: Oculto por defecto */
+    }
+
+    /* Solo mostrar cuando tiene clase .active */
+    .nav-container.active {
+        right: 0;
+        display: flex;
+    }
+
+    .nav-menu {
+        flex-direction: column;
+        width: 100%;
+        padding: 0;
+        gap: 0;
+    }
+
+    .nav-menu li {
+        width: 100%;
+        display: block;
+    }
+
+    .nav-link {
+        width: 100%;
+        padding: 0.9375rem 1.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0;
+        gap: 0.625rem;
+    }
+
+    #username {
+        width: 100%;
+        padding: 0.9375rem 1.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: block;
+    }
+
+    .nav-btn {
+        width: 100%;
+        padding: 0.9375rem 1.25rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0;
+        gap: 0.625rem;
+    }
+
+    .nav-overlay.active {
+        display: block;
+    }
+
+    /* Contenido principal */
+    .main-content {
+        margin-top: 60px;
+        padding: 0.75rem;
+    }
+
+    .admin-container,
+    .editor-container {
+        margin: 60px 0.3125rem 1.875rem 0.3125rem;
+        padding: 1rem;
+        max-width: 98vw;
+        border-radius: var(--border-radius-md);
+    }
+
+    .editor-container {
+        padding: 0.9375rem;
+        margin: 1.875rem 0.3125rem;
+    }
+
+    /* Formularios */
+    .form-actions {
+        flex-direction: column;
+        gap: 0.625rem;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .btn-icon {
+        min-width: auto;
+        padding: 0.5rem;
+    }
+
+    .btn-icon span {
+        display: none;
+    }
+
+    .btn-icon i {
+        font-size: 1.125rem;
+    }
+
+    /* Tablas */
+    .users-table,
+    .users-table thead,
+    .users-table tbody,
+    .users-table th,
+    .users-table td,
+    .users-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    .users-table thead {
+        display: none;
+    }
+
+    .users-table tr {
+        margin-bottom: 0.9375rem;
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius-md);
+        padding: 0.75rem;
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .users-table td {
+        border: none;
+        padding: 0.5rem 0.625rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .users-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #555;
+        flex-basis: 40%;
+        text-align: left;
+    }
+
+    .users-table td:last-child {
+        justify-content: flex-start;
+        gap: 0.5rem;
+    }
+
+    /* Login */
+    .login-container {
+        max-width: 98vw;
+        margin: 60px 0.3125rem 0 0.3125rem;
+        padding: 1.125rem 0.5rem 1rem 0.5rem;
+        border-radius: var(--border-radius-md);
+    }
+
+    .login-container h1 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn,
+    #login-form .btn {
+        font-size: 0.8125rem;
+        padding: 0.5rem 0;
+    }
+
+    /* Inicio */
+    .inicio-container {
+        padding: 1rem;
+    }
+
+    .inicio-logo {
+        max-width: 200px;
+        margin-bottom: 1.5rem;
+    }
+
+    .inicio-container h1 {
+        font-size: 1.5rem;
+    }
+
+    .inicio-container p {
+        font-size: 1rem;
+    }
+
+    /* Control de flujo */
+    .suggestions {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .suggestion-card {
+        padding: 1rem;
+    }
+
+    /* Footer */
+    footer {
+        font-size: 0.95rem;
+        padding: 0.875rem 0.3125rem 0.625rem 0.3125rem;
+        margin-top: 1.5rem;
+    }
+}
+
+/* ============================================
+   RESPONSIVE - MÓVILES PEQUEÑOS (max-width: 480px)
+   ============================================ */
+
+@media (max-width: 480px) {
+    .admin-header {
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem 0.125rem;
+        height: 55px;
+    }
+
+    .admin-header p,
+    .admin-header h1 {
+        font-size: 1.1rem;
+        margin-bottom: 0.375rem;
+    }
+
+    .user-info {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 0.625rem;
+    }
+
+    .admin-container,
+    .editor-container {
+        margin: 55px 0.125rem 1.25rem 0.125rem;
+        padding: 0.5rem;
+        max-width: 100vw;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .editor-container {
+        padding: 0.5rem;
+        margin: 1.25rem 0.125rem;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="file"],
+    .form-group textarea,
+    #login-form input[type="email"],
+    #login-form input[type="password"] {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .login-container {
+        max-width: 100vw;
+        margin: 40px 0.125rem 0 0.125rem;
+        padding: 0.625rem 0.25rem 0.625rem 0.25rem;
+    }
+
+    .login-container h1 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn,
+    #login-form .btn {
+        font-size: 0.8125rem;
+        padding: 0.5rem 0;
+    }
+
+    footer {
+        font-size: 0.85rem;
+        padding: 0.625rem 0.125rem 0.5rem 0.125rem;
+        margin-top: 1rem;
+    }
+
+    .main-content {
+        margin-top: 55px;
+        padding: 0.5rem;
+    }
+}
+
+/* ============================================
+   ANIMACIONES Y TRANSICIONES
+   ============================================ */
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.nav-container.active {
+    animation: slideIn 0.4s ease forwards;
+}
+
+/* ============================================
+   UTILIDADES Y ESTILOS ESPECÍFICOS
+   ============================================ */
+
+/* Asegurar que los enlaces sean siempre blancos */
+.admin-header a,
+.admin-header .nav-link,
+.admin-header .nav-btn {
+    color: var(--nav-text) !important;
+}
+
+/* Eliminar subrayados */
+.admin-header a,
+.admin-header .nav-link {
+    text-decoration: none !important;
+}
+
+/* Estilos para enlaces externos */
+.nav-link[target="_blank"]::after {
+    content: " ↗";
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+/* Estilos para iconos en enlaces */
+.nav-link i,
+.nav-btn i {
+    font-size: 0.9em;
+}
+
+/* Forzar que el contenido de las celdas se ajuste */
+.users-table th,
+.users-table td {
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+    max-width: 200px;
+}
+
+/* Contenedor de la tabla con scroll */
+.users-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Para páginas específicas */
+body.usuarios-page .admin-container {
+    max-width: 95%;
+    padding: 1.25rem 1.875rem;
+}
+
+body.usuarios-page .users-table-container {
+    max-width: 100%;
+    width: 100%;
+    margin: 1.5625rem auto;
+}
+
+/* Ocultar texto en botones pequeños en móvil */
+@media (max-width: 768px) {
+    .btn-icon span {
+        display: none;
+    }
+
+    .btn-icon i {
+        font-size: 1.125rem;
+    }
+}

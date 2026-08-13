@@ -1,0 +1,7 @@
+[2025-09-25T16:45:13+02:00] [DBERR68d5557932f4b7.24028504] Error de conexión a la base de datos: SQLSTATE[HY000] [1045] Access denied for user 'cgomez'@'187.39.255.48' (using password: YES)
+DSN: 148.72.3.93 / DB: sistema_noticias
+PHP: 8.0.30 PDO error trace:
+#0 C:\xampp\htdocs\admin\api\database.php(28): PDO->__construct('mysql:host=148....', 'cgomez', 'SQLc0dehc1u*', Array)
+#1 C:\xampp\htdocs\admin\api\auth.php(11): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+

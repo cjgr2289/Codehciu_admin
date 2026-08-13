@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Principal - CODEHCIU</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/politicas-modal.css">
+    <link rel="shortcut icon" href="css/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/session-validator.js"></script>
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+    <div id="politicas-modal-container"></div>
+
+    <main class="main-content inicio-main">
+        <div class="inicio-container">
+            <img src="css/LOGO.png" alt="LOGO CODEHCIU" class="inicio-logo">
+            <h1>Bienvenido al Sistema de CODEHCIU</h1>
+            <p>Selecciona una opción del menú de navegación para comenzar</p>
+
+            <!-- Cuadro central con saludo personalizado -->
+            <div class="inicio-welcome">
+                <h2 id="welcome-message"></h2>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/politicas-modal.js"></script>
+    <script>
+        function updateNavbarByRole(role) {
+            const noticiasItem = document.getElementById('noticias-item');
+            const finanzasItem = document.getElementById('finanzas-item');
+            const credencialesItem = document.getElementById('credenciales-item');
+            const politicasItem = document.getElementById('politicas-item');
+            const correoItem = document.getElementById('correo-item');
+            const usuariosItem = document.getElementById('usuarios-item');
+            const userInfoItem = document.getElementById('user-info-item');
+            const logoutItem = document.getElementById('logout-item');
+
+            if (noticiasItem) noticiasItem.style.display = 'none';
+            if (finanzasItem) finanzasItem.style.display = 'none';
+            if (credencialesItem) credencialesItem.style.display = 'none';
+            if (politicasItem) politicasItem.style.display = 'none';
+            if (correoItem) correoItem.style.display = 'none';
+            if (usuariosItem) usuariosItem.style.display = 'none';
+            if (userInfoItem) userInfoItem.style.display = 'list-item';
+            if (logoutItem) logoutItem.style.display = 'list-item';
+
+            const roleLower = role.toLowerCase();
+
+            switch (roleLower) {
+                case 'admin':
+                case 'administrador':
+                    if (noticiasItem) noticiasItem.style.display = 'list-item';
+                    if (finanzasItem) finanzasItem.style.display = 'list-item';
+                    if (credencialesItem) credencialesItem.style.display = 'list-item';
+                    if (politicasItem) politicasItem.style.display = 'list-item';
+                    if (correoItem) correoItem.style.display = 'list-item';
+                    if (usuariosItem) usuariosItem.style.display = 'list-item';
+                    break;
+                case 'editor':
+                    if (noticiasItem) noticiasItem.style.display = 'list-item';
+                    if (credencialesItem) credencialesItem.style.display = 'list-item';
+                    if (politicasItem) politicasItem.style.display = 'list-item';
+                    if (correoItem) correoItem.style.display = 'list-item';
+                    break;
+                case 'contab':
+                case 'contador':
+                    if (finanzasItem) finanzasItem.style.display = 'list-item';
+                    if (credencialesItem) credencialesItem.style.display = 'list-item';
+                    if (politicasItem) politicasItem.style.display = 'list-item';
+                    if (correoItem) correoItem.style.display = 'list-item';
+                    break;
+                case 'coord':
+                case 'coordinador':
+                    if (finanzasItem) finanzasItem.style.display = 'list-item';
+                    if (credencialesItem) credencialesItem.style.display = 'list-item';
+                    if (politicasItem) politicasItem.style.display = 'list-item';
+                    if (correoItem) correoItem.style.display = 'list-item';
+                    break;
+                case 'socio':
+                    if (finanzasItem) finanzasItem.style.display = 'list-item';
+                    if (politicasItem) politicasItem.style.display = 'list-item';
+                    break;
+                case 'directivo':
+                    if (noticiasItem) noticiasItem.style.display = 'list-item';
+                    if (finanzasItem) finanzasItem.style.display = 'list-item';
+                    if (credencialesItem) credencialesItem.style.display = 'list-item';
+                    if (politicasItem) politicasItem.style.display = 'list-item';
+                    if (correoItem) correoItem.style.display = 'list-item';
+                    break;
+                case 'regular':
+                    if (credencialesItem) credencialesItem.style.display = 'list-item';
+                    if (politicasItem) politicasItem.style.display = 'list-item';
+                    if (correoItem) correoItem.style.display = 'list-item';
+                    break;
+                default:
+                    if (credencialesItem) credencialesItem.style.display = 'list-item';
+                    if (politicasItem) politicasItem.style.display = 'list-item';
+                    if (correoItem) correoItem.style.display = 'list-item';
+                    break;
+            }
+        }
+
+        async function initializeNavbar(user) {
+            const usernameElement = document.getElementById('username');
+            if (usernameElement) usernameElement.textContent = user.name;
+
+            // Mensaje de bienvenida personalizado en el cuadro central
+            const welcomeElement = document.getElementById('welcome-message');
+            if (welcomeElement) welcomeElement.textContent = `Bienvenido, ${user.name}`;
+
+            const roleInfoElement = document.getElementById('user-role-info');
+            if (roleInfoElement) roleInfoElement.textContent = `Rol: ${user.role}`;
+
+            updateNavbarByRole(user.role);
+
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function () {
+                    Swal.fire({
+                        title: '¿Cerrar sesión?',
+                        text: '¿Estás seguro de que quieres salir del sistema?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, cerrar sesión',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            localStorage.removeItem('user');
+                            window.location.href = 'index.html';
+                        }
+                    });
+                });
+            }
+
+            const politicasLink = document.getElementById('ver-politicas-link');
+            if (politicasLink) {
+                politicasLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const politicasModal = document.getElementById('politicasModal');
+                    if (politicasModal && typeof window.initPoliticasModal === 'function') {
+                        politicasModal.style.display = 'block';
+                    }
+                });
+            }
+
+            if (typeof initResponsiveMenu === 'function') initResponsiveMenu();
+        }
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            const user = await validateSession(); // cualquier usuario logueado puede entrar
+            if (!user) return;
+
+            try {
+                const response = await fetch('navbar.html');
+                const html = await response.text();
+                document.getElementById('navbar-container').innerHTML = html;
+                await initializeNavbar(user);
+            } catch (error) {
+                console.error('Error cargando navbar:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo cargar la navegación. Recarga la página.',
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('politicas-modal.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('politicas-modal-container').innerHTML = data;
+                    if (typeof initPoliticasModal === 'function') setTimeout(initPoliticasModal, 100);
+                })
+                .catch(error => console.error('Error cargando el modal de políticas:', error));
+        });
+    </script>
+
+    <footer>
+        <p>&copy; 2015 CODEHCIU. Todos los derechos reservados.</p>
+    </footer>
+</body>
+
+</html>

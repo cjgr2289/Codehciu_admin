@@ -1,0 +1,186 @@
+/* Estilos para el modal de políticas */
+#politicas-modal {
+    display: none; /* Esto controla la visibilidad inicial */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    /* Centrado perfecto con flexbox */
+    justify-content: center;
+    align-items: center;
+    /* Asegurar que esté por encima de todo */
+}
+
+/* Cuando el modal es visible */
+#politicas-modal.visible {
+    display: flex;
+}
+
+.politicas-content {
+    background: white;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    /* Efecto de aparición suave */
+    animation: modalFadeIn 0.3s ease-out;
+    /* Scroll interno para contenido largo */
+    overflow: hidden;
+}
+
+
+/* Animación de aparición */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.politicas-header {
+    padding: 20px;
+    background: #2c3e50;
+    color: white;
+    font-size: 1.5em;
+    text-align: center;
+    position: relative;
+}
+
+.politicas-text {
+    padding: 20px;
+    overflow-y: auto;
+    flex-grow: 1;
+    border-bottom: 1px solid #eee;
+    /* Mejor legibilidad para texto largo */
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.politicas-actions {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #eee;
+}
+
+/* Estilo para el checkbox deshabilitado */
+#politicas-check:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Estilo para el botón Cerrar */
+#cerrar-politicas-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#cerrar-politicas-btn:hover {
+    background: #5a6268;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .politicas-content {
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .politicas-header {
+        padding: 15px;
+        font-size: 1.3em;
+    }
+    
+    .politicas-text {
+        padding: 15px;
+    }
+}
+
+/* Estilos para el modal de políticas */
+#politicas-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+#politicas-modal.visible {
+    display: block;
+}
+
+#politicas-modal.visible.bloqueado {
+    cursor: not-allowed;
+}
+
+#politicas-modal.visible.bloqueado .politicas-content {
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+    border: 2px solid #ff4444;
+}
+
+.politicas-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 8px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.cerrar-modal:hover {
+    color: #000;
+}
+
+/* Mensaje de advertencia */
+.mensaje-bloqueo {
+    display: none;
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border-left: 4px solid #ffc107;
+}
+
+#politicas-modal.visible.bloqueado .mensaje-bloqueo {
+    display: block;
+}
+
+/* Resto de tus estilos existentes... */

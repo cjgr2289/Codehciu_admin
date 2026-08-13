@@ -1,0 +1,1195 @@
+
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Reporte Financiero - 4)</title>
+                <style>
+                    /* Estilos para impresión */
+                    @media print {
+                        body { margin: 0; padding: 0; font-size: 12pt; }
+                        .no-print { display: none !important; }
+                        .page-break { page-break-before: always; }
+                    }
+                    
+                    body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        max-width: 210mm; /* A4 */
+                        margin: 0 auto;
+                        padding: 20mm;
+                        background: white;
+                    }
+                    
+                    .header {
+                        text-align: center;
+                        border-bottom: 3px solid #007bff;
+                        padding-bottom: 20px;
+                        margin-bottom: 30px;
+                    }
+                    
+                    .header h1 {
+                        color: #007bff;
+                        margin: 0;
+                        font-size: 24px;
+                    }
+                    
+                    .header .subtitle {
+                        color: #666;
+                        font-size: 14px;
+                        margin-top: 5px;
+                    }
+                    
+                    .logo {
+                        max-height: 60px;
+                        margin-bottom: 15px;
+                    }
+                    
+                    .section {
+                        margin-bottom: 25px;
+                        page-break-inside: avoid;
+                    }
+                    
+                    .section-title {
+                        background-color: #f8f9fa;
+                        padding: 10px 15px;
+                        border-left: 4px solid #007bff;
+                        margin-bottom: 15px;
+                        font-weight: bold;
+                        font-size: 16px;
+                    }
+                    
+                    .info-box {
+                        background-color: #f8f9fa;
+                        border: 1px solid #dee2e6;
+                        border-radius: 5px;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                    }
+                    
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                        font-size: 12px;
+                    }
+                    
+                    th {
+                        background-color: #007bff;
+                        color: white;
+                        padding: 10px;
+                        text-align: left;
+                        font-weight: bold;
+                        border: 1px solid #0056b3;
+                    }
+                    
+                    td {
+                        padding: 8px 10px;
+                        border: 1px solid #dee2e6;
+                        vertical-align: top;
+                    }
+                    
+                    tr:nth-child(even) {
+                        background-color: #f9f9f9;
+                    }
+                    
+                    .total-row {
+                        font-weight: bold;
+                        background-color: #e9ecef;
+                    }
+                    
+                    .text-right {
+                        text-align: right;
+                    }
+                    
+                    .text-center {
+                        text-align: center;
+                    }
+                    
+                    .currency {
+                        text-align: right;
+                        font-family: 'Courier New', monospace;
+                    }
+                    
+                    .warning {
+                        color: #dc3545;
+                        font-weight: bold;
+                    }
+                    
+                    .success {
+                        color: #28a745;
+                    }
+                    
+                    .info {
+                        color: #17a2b8;
+                    }
+                    
+                    .indent {
+                        margin-left: 20px;
+                        padding-left: 10px;
+                        border-left: 2px solid #6c757d;
+                    }
+                    
+                    .footer {
+                        margin-top: 50px;
+                        text-align: center;
+                        font-size: 10px;
+                        color: #666;
+                        border-top: 1px solid #dee2e6;
+                        padding-top: 15px;
+                    }
+                    
+                    .print-button {
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        margin: 20px 0;
+                    }
+                    
+                    .print-button:hover {
+                        background-color: #0056b3;
+                    }
+                    
+                    .row {
+                        display: flex;
+                        flex-wrap: wrap;
+                        margin: 0 -10px;
+                    }
+                    
+                    .col {
+                        flex: 1;
+                        padding: 0 10px;
+                        min-width: 250px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div>
+                        <img src="https://via.placeholder.com/200x60/007bff/ffffff?text=CODEHCIU" alt="Logo CODEHCIU" class="logo">
+                    </div>
+                    <h1>REPORTE FINANCIERO</h1>
+                    <div class="subtitle">4)</div>
+                    <div class="subtitle">Generado el viernes, 2 de enero de 2026, 15:24</div>
+                </div>
+                
+                <div class="no-print" style="text-align: center;">
+                    <button class="print-button" onclick="window.print()">
+                        📄 Imprimir o Guardar como PDF
+                    </button>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Usa la opción "Imprimir" de tu navegador y selecciona "Guardar como PDF"
+                    </p>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Información del Proyecto</div>
+                    <div class="info-box">
+                        <div class="row">
+                            <div class="col">
+                                <strong>Nombre del Proyecto:</strong><br>
+                                4)
+                            </div>
+                            <div class="col">
+                                <strong>Presupuesto Total:</strong><br>
+                                $0.00 USD
+                            </div>
+                            <div class="col">
+                                <strong>Fecha de Generación:</strong><br>
+                                2 de enero de 2026
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Resumen Financiero</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Concepto</th>
+                                <th class="text-right">Monto (USD)</th>
+                                <th class="text-right">Porcentaje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Presupuesto Total del Proyecto</td>
+                                <td class="currency">$300.00</td>
+                                <td class="text-right">100%</td>
+                            </tr>
+                            <tr>
+                                <td>Abonos Recibidos</td>
+                                <td class="currency">$327.10</td>
+                                <td class="text-right">109.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Gastos Realizados</td>
+                                <td class="currency">$147.57</td>
+                                <td class="text-right">49.2%</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Saldo Disponible en Caja</strong></td>
+                                <td class="currency"><strong>$179.53</strong></td>
+                                <td class="text-right"><strong>54.9%</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Saldo por Cobrar (70% ejecución)</td>
+                                <td class="currency">$46.73</td>
+                                <td class="text-right">70%</td>
+                            </tr>
+                            <tr>
+                                <td>Activos Líquidos (Abono + Caja)</td>
+                                <td class="currency">$226.26</td>
+                                <td class="text-right">75.4%</td>
+                            </tr>
+                            <tr>
+                                <td>PSC COST (7% del presupuesto)</td>
+                                <td class="currency">$21.00</td>
+                                <td class="text-right">7%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                
+                <div class="section">
+                    <div class="section-title">Partidas del Proyecto</div>
+                    
+                    
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; font-size: 14px;">
+                                    <strong> - </strong>
+                                </h3>
+                                <span class="success" style="font-size: 12px;">
+                                    <strong>0.0% gastado (SALUDABLE)</strong>
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <div>
+                                    <strong>Presupuesto:</strong> $0.00 USD<br>
+                                    <strong>Gastado:</strong> $0.00 USD
+                                </div>
+                                <div>
+                                    <strong>Saldo disponible:</strong> $0.00 USD<br>
+                                    <strong>Estado:</strong> <span class="success">SALUDABLE</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                </div>
+                
+                
+                <div class="footer">
+                    <p><strong>Reporte generado automáticamente por el Sistema de Control de Flujo Financiero</strong></p>
+                    <p><strong>CODEHCIU - Centro de Desarrollo Humano y Comunitario Integral Universitario</strong></p>
+                    <p>Este documento es confidencial y para uso exclusivo de la organización.</p>
+                    <p>Página 1 de 1 | Fecha de impresión: 2/1/2026, 3:24:04 p.m.</p>
+                </div>
+                
+                <script>
+                    // Script para mejorar la experiencia de impresión
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Eliminar el botón de imprimir al imprimir
+                        window.addEventListener('beforeprint', function() {
+                            document.querySelector('.no-print').style.display = 'none';
+                        });
+                        
+                        // Restaurar el botón después de imprimir
+                        window.addEventListener('afterprint', function() {
+                            document.querySelector('.no-print').style.display = 'block';
+                        });
+                    });
+                </script>
+            </body>
+            </html>
+            

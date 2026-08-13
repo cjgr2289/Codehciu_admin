@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Usuarios - CODEHCIU</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/usuarios.css">
+    <link rel="stylesheet" href="css/chance_pass.css">
+    <link rel="stylesheet" href="css/politicas-modal.css">
+    <link rel="shortcut icon" href="css/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+    /* Ajuste para que el título no quede tapado por la navbar fija */
+    body.usuarios-page {
+        padding-top: 80px; /* Ajusta este valor según la altura real de tu navbar */
+    }
+
+    /* Opcional: si solo quieres desplazar el contenedor principal */
+    .admin-container {
+        margin-top: 0; /* Puedes usar margin-top en lugar de padding-top del body */
+    }
+
+    /* Ajuste para móviles si la navbar cambia de altura */
+    @media (max-width: 768px) {
+        body.usuarios-page {
+            padding-top: 70px;
+        }
+    }
+    /* ========== MODAL DATOS DE PAGO ========== */
+.modal-datos-pago {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-datos-pago.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal-datos-pago .modal-content {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 700px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-datos-pago .modal-header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.modal-datos-pago .modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-datos-pago .modal-header .modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.modal-datos-pago .modal-header .modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.modal-datos-pago .modal-body {
+    padding: 24px;
+}
+
+.modal-datos-pago .user-info-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border-left: 4px solid #667eea;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.modal-datos-pago .user-info-card .user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.modal-datos-pago .user-info-card .user-details {
+    flex: 1;
+}
+
+.modal-datos-pago .user-info-card .user-details strong {
+    display: block;
+    font-size: 16px;
+    color: #333;
+}
+
+.modal-datos-pago .user-info-card .user-details small {
+    color: #666;
+    font-size: 13px;
+}
+
+.modal-datos-pago .form-group {
+    margin-bottom: 16px;
+}
+
+.modal-datos-pago .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+.modal-datos-pago .form-group label .required {
+    color: #e74c3c;
+    margin-left: 3px;
+}
+
+.modal-datos-pago .form-group .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+.modal-datos-pago .form-group .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.modal-datos-pago .form-group .form-control:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.modal-datos-pago .form-group .form-text {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+.modal-datos-pago .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 600px) {
+    .modal-datos-pago .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.modal-datos-pago .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+}
+
+.modal-datos-pago .checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #667eea;
+    cursor: pointer;
+}
+
+.modal-datos-pago .checkbox-group label {
+    font-weight: 500;
+    cursor: pointer;
+    margin: 0;
+}
+
+.modal-datos-pago .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: #f8f9fa;
+    border-radius: 0 0 16px 16px;
+}
+
+.modal-datos-pago .btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-datos-pago .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.modal-datos-pago .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.modal-datos-pago .btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.modal-datos-pago .btn-danger:hover {
+    background: #c0392b;
+}
+
+.modal-datos-pago .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-datos-pago .btn-secondary:hover {
+    background: #5a6268;
+}
+
+.modal-datos-pago .btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.modal-datos-pago .btn-success:hover {
+    background: #218838;
+}
+
+.modal-datos-pago .btn-eliminar-datos-pago {
+    display: none;
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-datos-pago .btn-eliminar-datos-pago:hover {
+    background: #c82333;
+}
+
+/* Estilo para el botón de datos de pago en la tabla */
+.btn-datos-pago {
+    background: #28a745;
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-datos-pago:hover {
+    background: #218838;
+    transform: scale(1.05);
+}
+
+.btn-datos-pago i {
+    font-size: 14px;
+}
+
+/* Badge para indicar si tiene datos de pago */
+.badge-datos-pago {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.badge-datos-pago.completo {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-datos-pago.incompleto {
+    background: #f8d7da;
+    color: #721c24;
+}
+</style>
+
+</head>
+
+
+<body class="usuarios-page">
+    <!-- Cargar navbar dinámicamente -->
+    <div id="navbar-container"></div>
+
+    <div id="politicas-modal-container"></div>
+
+    <div class="admin-container">
+        <h2>Gestión de Usuarios</h2>
+        <button id="show-user-form" class="btn">+ Crear Nuevo Usuario</button>
+
+        <!-- Barra de búsqueda -->
+        <div class="search-container">
+            <input type="text" id="search-users" placeholder="Buscar por nombre, email o cédula...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div id="users-list" style="margin-top: 30px;">
+            <!-- Listado de usuarios -->
+        </div>
+    </div>
+
+    <!-- Modal para formulario de usuario -->
+    <div id="user-form-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="user-form-title">Crear Nuevo Usuario</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="user-form-container">
+                    <!-- Formulario cargado con fetch -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedores para preview de credenciales/firma (ocultos por defecto) -->
+    <div id="preview-container-usuarios"
+        style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; padding: 20px;">
+        <div
+            style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; max-height: 90%; overflow: auto; margin: 0 auto; position: relative;">
+            <button onclick="document.getElementById('preview-container-usuarios').style.display = 'none'"
+                style="position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;">X</button>
+            <div id="preview-content-usuarios"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="download-btn-usuarios" class="btn">Descargar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para cambio de contraseña -->
+    <div id="change-password-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cambiar Contraseña</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="change-password-form">
+                    <div class="form-group">
+                        <label for="current-password">Contraseña Actual:</label>
+                        <input type="password" id="current-password" name="current_password">
+                        <small>Solo necesario si no es el primer inicio</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new-password">Nueva Contraseña:</label>
+                        <div class="password-input-container">
+                            <input type="password" id="new-password" name="new_password" required>
+                            <button type="button" class="toggle-password" data-target="new-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small id="password-requirements">
+                            La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y un
+                            carácter especial
+                        </small>
+                        <div id="password-strength" class="password-strength">
+                            <div class="strength-bar"></div>
+                            <span class="strength-text">Seguridad: Débil</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm-password">Confirmar Nueva Contraseña:</label>
+                        <div class="password-input-container">
+                            <input type="password" id="confirm-password" name="confirm_password" required>
+                            <button type="button" class="toggle-password" data-target="confirm-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small id="password-match" class="hidden">Las contraseñas no coinciden</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn" id="submit-password-change">Cambiar Contraseña</button>
+                        <button type="button" class="btn cancel" id="cancel-password-change">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: DATOS DE PAGO DE USUARIO           -->
+    <!-- ========================================== -->
+    <div id="modal-datos-pago" class="modal-datos-pago">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header">
+                <h3><i class="fas fa-credit-card"></i> Datos de Pago</h3>
+                <button class="modal-close" title="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+    
+            <!-- Body -->
+            <div class="modal-body">
+                <!-- Información del usuario -->
+                <div class="user-info-card">
+                    <div class="user-avatar" id="datos-pago-avatar">
+                        <span id="datos-pago-inicial">U</span>
+                    </div>
+                    <div class="user-details">
+                        <strong id="datos-pago-user-name">Nombre del Usuario</strong>
+                        <small id="datos-pago-user-email">email@ejemplo.com</small>
+                    </div>
+                </div>
+    
+                <!-- Formulario -->
+                <form id="form-datos-pago">
+                    <input type="hidden" id="datos-pago-usuario-id" value="">
+    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="datos-pago-banco">Banco <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="datos-pago-banco"
+                                placeholder="Ej: Banesco, Mercantil, BOD..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="datos-pago-tipo-cuenta">Tipo de Cuenta <span class="required">*</span></label>
+                            <select class="form-control" id="datos-pago-tipo-cuenta" required>
+                                <option value="Corriente">Corriente</option>
+                                <option value="Ahorro">Ahorro</option>
+                                <option value="Ambas">Ambas</option>
+                            </select>
+                        </div>
+                    </div>
+    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="datos-pago-numero-cuenta">Número de Cuenta <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="datos-pago-numero-cuenta"
+                                placeholder="Ej: 0102-012345-6789" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="datos-pago-numero-cedula">Cédula / RIF <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="datos-pago-numero-cedula"
+                                placeholder="Ej: V-12345678 o J-123456789" required>
+                        </div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="datos-pago-forma-pago">Forma de Pago</label>
+                        <select class="form-control" id="datos-pago-forma-pago">
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Pago Movil">Pago Móvil</option>
+                            <option value="Efectivo">Efectivo</option>
+                        </select>
+                    </div>
+    
+                    <!-- Checkbox Tercero -->
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="datos-pago-es-tercero">
+                        <label for="datos-pago-es-tercero">
+                            <i class="fas fa-user-tie"></i> Es un tercero / consultor
+                        </label>
+                        <small class="form-text" style="margin-left: auto; color: #6c757d;">
+                            (Seleccionar si es proveedor de servicios)
+                        </small>
+                    </div>
+    
+                    <!-- Honorarios (visible solo si es tercero) -->
+                    <div id="honorarios-group" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="datos-pago-monto-honorarios">Monto de Honorarios</label>
+                                <div class="input-group" style="display: flex; align-items: center;">
+                                    <span
+                                        style="background: #e9ecef; padding: 10px 12px; border-radius: 8px 0 0 8px; border: 2px solid #e0e0e0; border-right: none; font-weight: 600;">$</span>
+                                    <input type="number" class="form-control" id="datos-pago-monto-honorarios" step="0.01"
+                                        min="0" placeholder="0.00" style="border-radius: 0 8px 8px 0; border-left: none;">
+                                </div>
+                                <small class="form-text">Monto fijo de honorarios para este usuario</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="datos-pago-tipo-contrato">Tipo de Contrato</label>
+                                <select class="form-control" id="datos-pago-tipo-contrato">
+                                    <option value="Honorarios">Honorarios</option>
+                                    <option value="Servicios">Servicios</option>
+                                    <option value="Consultoria">Consultoría</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="datos-pago-observaciones">Observaciones</label>
+                        <textarea class="form-control" id="datos-pago-observaciones" rows="3"
+                            placeholder="Notas adicionales sobre la cuenta o el beneficiario..."></textarea>
+                    </div>
+                </form>
+            </div>
+    
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="datosPagoUsuarios.cerrarModal()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn-eliminar-datos-pago" id="btn-eliminar-datos-pago">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </button>
+                <button type="button" class="btn btn-success" id="btn-guardar-datos-pago">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal de Proyectos Asignados Mejorado -->
+<div id="proyectos-asignados-modal" class="modal proyectos-modal" style="display: none;">
+    <div class="modal-content proyectos-modal-content">
+        <!-- Cabecera moderna -->
+        <div class="modal-header proyectos-modal-header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="header-text">
+                    <h3>Gestión de Proyectos</h3>
+                    <p>Administra los proyectos asignados al usuario</p>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="cerrarModalProyectosAsignados()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- Cuerpo del modal -->
+        <div class="modal-body proyectos-modal-body">
+            <!-- Información del usuario -->
+            <div id="proyectos-user-info" class="proyectos-user-info">
+                <!-- Se llena dinámicamente -->
+            </div>
+            
+            <!-- Contador de proyectos -->
+            <div class="proyectos-stats">
+                <div class="stat-card">
+                    <i class="fas fa-folder-open"></i>
+                    <div>
+                        <span class="stat-number" id="total-proyectos">0</span>
+                        <span class="stat-label">Proyectos Asignados</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div>
+                        <span class="stat-number" id="total-colaboradores">0</span>
+                        <span class="stat-label">Roles Activos</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lista de proyectos -->
+            <div id="proyectos-lista" class="proyectos-lista">
+                <!-- Se llena dinámicamente -->
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Cargando proyectos...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pie del modal con botones de acción -->
+        <div class="modal-footer proyectos-modal-footer">
+            <button class="btn-back" onclick="cerrarModalProyectosAsignados()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+            <button class="btn-assign-new" onclick="abrirModalAsignarProyectoDesdeAsignados()">
+                <i class="fas fa-plus-circle"></i> Asignar Nuevo Proyecto
+            </button>
+        </div>
+    </div>
+</div>
+
+    <script src="js/change-password.js"></script>
+    <script src="js/credenciales.js"></script>
+    <script src="js/proyectos-usuarios.js"></script>
+    <script src="js/usuarios.js"></script>
+    <script src="js/politicas-modal.js"></script>
+    <script src="js/responsive.js"></script>
+    <script src="js/datos-pago-usuarios.js"></script>
+
+    <script>
+        // Cargar navbar
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+                // Inicializar navbar
+                initializeNavbar();
+            })
+            .catch(error => {
+                console.error('Error cargando navbar:', error);
+            });
+
+        function initializeNavbar() {
+            // Función para mostrar/ocultar enlaces según rol
+            function updateNavbarByRole(role) {
+                const adminLink = document.querySelector('a[href="admin.html"]');
+                const controlFlujoLink = document.querySelector('a[href="control-flujo.html"]');
+                const usuariosLink = document.getElementById('usuarios-link');
+                const credencialesLink = document.querySelector('a[href="credenciales.html"]');
+                const politicasLink = document.getElementById('ver-politicas-link');
+                const correoLink = document.querySelector('a[href="https://correo.codehciu.org"]');
+
+                // Ocultar todos inicialmente
+                if (adminLink) adminLink.parentElement.style.display = 'none';
+                if (controlFlujoLink) controlFlujoLink.parentElement.style.display = 'none';
+                if (usuariosLink) usuariosLink.style.display = 'none';
+
+                // Mostrar según rol
+                switch (role) {
+                    case 'admin':
+                    case 'administrador':
+                        if (adminLink) adminLink.parentElement.style.display = 'list-item';
+                        if (controlFlujoLink) controlFlujoLink.parentElement.style.display = 'list-item';
+                        if (usuariosLink) usuariosLink.style.display = 'list-item';
+                        break;
+                    case 'editor':
+                        if (adminLink) adminLink.parentElement.style.display = 'list-item';
+                        break;
+                    case 'contab':
+                    case 'contador':
+                        if (controlFlujoLink) controlFlujoLink.parentElement.style.display = 'list-item';
+                        break;
+                    default:
+                        // Usuario regular
+                        break;
+                }
+
+                // Todos los usuarios pueden ver credenciales, políticas y correo
+                if (credencialesLink) credencialesLink.parentElement.style.display = 'list-item';
+                if (politicasLink) politicasLink.parentElement.style.display = 'list-item';
+                if (correoLink) correoLink.parentElement.style.display = 'list-item';
+            }
+
+            // Verificar sesión y rol
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (!user) {
+                window.location.href = 'index.html';
+            } else {
+                // Solo administradores pueden ver esta página
+                if (user.role !== 'admin' && user.role !== 'administrador') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Acceso denegado',
+                        text: 'Solo los administradores pueden acceder a esta página.',
+                        willClose: () => {
+                            window.location.href = 'inicio.html';
+                        }
+                    });
+                    return;
+                }
+
+                document.getElementById('username').textContent = user.name;
+
+                // Actualizar navbar según rol
+                updateNavbarByRole(user.role);
+
+                // Forzar mostrar enlace de usuarios (ya que estamos en la página de usuarios)
+                const usuariosLink = document.getElementById('usuarios-link');
+                if (usuariosLink) {
+                    usuariosLink.style.display = 'list-item';
+                }
+            }
+
+            // Botón cerrar sesión
+            document.getElementById('logout-btn').addEventListener('click', function () {
+                Swal.fire({
+                    title: '¿Cerrar sesión?',
+                    text: '¿Estás seguro de que quieres salir del sistema?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, cerrar sesión',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('user');
+                        window.location.href = 'index.html';
+                    }
+                });
+            });
+
+            // Toggle menú hamburguesa
+            document.querySelector('.menu-toggle').addEventListener('click', function () {
+                const navContainer = document.querySelector('.nav-container');
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !isExpanded);
+                navContainer.classList.toggle('active');
+            });
+
+            // Enlace ver políticas
+            document.getElementById('ver-politicas-link').addEventListener('click', function (e) {
+                e.preventDefault();
+                const politicasModal = document.getElementById('politicasModal');
+                if (politicasModal && typeof window.initPoliticasModal === 'function') {
+                    politicasModal.style.display = 'block';
+                }
+            });
+        }
+
+        // Cargar el modal de políticas
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('politicas-modal.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('politicas-modal-container').innerHTML = data;
+                    if (typeof initPoliticasModal === 'function') {
+                        setTimeout(initPoliticasModal, 100);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando el modal de políticas:', error);
+                });
+        });
+
+        // Cargar formulario externo con fetch
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('user-form.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('user-form-container').innerHTML = html;
+
+                    // Inicializar la gestión de usuarios después de cargar el formulario
+                    if (typeof initUserManagement === 'function') {
+                        initUserManagement();
+                    }
+                })
+                .catch(error => console.error('Error cargando formulario:', error));
+
+            // Inicializar modal de cambio de contraseña
+            if (typeof initChangePasswordModal === 'function') {
+                initChangePasswordModal();
+            }
+        });
+
+        // Inicializar eventos de modales
+        document.addEventListener('DOMContentLoaded', function () {
+            // Cerrar modales al hacer clic en la X
+            document.querySelectorAll('.close-modal').forEach(closeBtn => {
+                closeBtn.addEventListener('click', function () {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+
+            // Cerrar modales al hacer clic fuera del contenido
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        
+    </script>
+    <!-- Script para datos de pago de usuarios -->
+    
+</body>
+
+</html>

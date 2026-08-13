@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/politicas-modal.css">
+    <link rel="shortcut icon" href="css/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<!-- Cargar navbar dinámicamente -->
+<div id="navbar-container"></div>
+
+<!-- Modal de Políticas -->
+<div id="politicas-modal-container"></div>
+
+<div class="editor-container" style="margin-top:70px;">
+    <h2 id="editor-title">Crear Nueva Noticia</h2>
+    <form id="news-form">
+        <input type="hidden" id="news-id" value="">
+        
+        <div class="form-group">
+            <label for="news-title">Título:</label>
+            <input type="text" id="news-title" required maxlength="200">
+        </div>
+        
+        <div class="form-group">
+            <label for="news-image">Imagen:</label>
+            <input type="file" id="news-image" accept="image/*" required>
+            <small>Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 2MB</small>
+            <div class="image-preview" id="image-preview" style="display: none;">
+                <img src="" alt="Vista previa" id="preview-img" style="max-width: 300px; max-height: 200px;">
+                <button type="button" id="remove-image" class="btn cancel" style="margin-top: 10px;">
+                    <i class="fas fa-times"></i> Quitar imagen
+                </button>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="news-date">Fecha:</label>
+            <input type="date" id="news-date" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="news-summary">Resumen:</label>
+            <textarea id="news-summary" rows="3" required maxlength="500" placeholder="Resumen breve de la noticia..."></textarea>
+            <small><span id="summary-chars">0</span>/500 caracteres</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="news-content">Contenido completo:</label>
+            <textarea id="news-content" rows="8" required placeholder="Contenido completo de la noticia..."></textarea>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn" id="submit-btn">
+                <i class="fas fa-save"></i> <span id="submit-text">Guardar Noticia</span>
+            </button>
+            <a href="admin.html" class="btn cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="js/politicas-modal.js"></script>
+<script src="js/responsive.js"></script>
+<script>
+// Verificar autenticación (al inicio del script)
+const user = JSON.parse(localStorage.getItem('user'));
+console.log('Usuario en editor:', user);
+
+if (!user) {
+    // Redirección inteligente
+    if (window.location.pathname.includes('/admin/')) {
+        window.location.href = '../index.html';
+    } else {
+        window.location.href = 'index.html';
+    }
+} else {
+    document.getElementById('username').textContent = user.name;
+    
+    // Verificar rol (solo editor y admin pueden acceder)
+    if (user.role !== 'editor' && user.role !== 'admin') {
+        alert('No tienes permisos para acceder a esta página');
+        window.location.href = 'admin.html';
+    }
+}
+
+// Y en el logout, también actualizar:
+document.getElementById('logout-btn').addEventListener('click', function() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('politicasAceptadas');
+    // Redirección inteligente
+    if (window.location.pathname.includes('/admin/')) {
+        window.location.href = '../index.html';
+    } else {
+        window.location.href = 'index.html';
+    }
+});
+
+// Variables para manejar la imagen
+let currentImageFile = null;
+let hasExistingImage = false;
+
+// Configurar fecha actual por defecto
+document.getElementById('news-date').value = new Date().toISOString().split('T')[0];
+
+// Contador de caracteres para el resumen
+document.getElementById('news-summary').addEventListener('input', function() {
+    const count = this.value.length;
+    document.getElementById('summary-chars').textContent = count;
+});
+
+// Manejar logout
+document.getElementById('logout-btn').addEventListener('click', function() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('politicasAceptadas');
+    window.location.href = '../index.html';
+});
+
+// Manejar selección de imagen
+document.getElementById('news-image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    
+    if (file) {
+        // Validar tipo de archivo
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Solo se permiten imágenes JPG, PNG o GIF'
+            });
+            this.value = '';
+            return;
+        }
+        
+        // Validar tamaño (2MB máximo)
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La imagen no puede superar los 2MB'
+            });
+            this.value = '';
+            return;
+        }
+        
+        currentImageFile = file;
+        
+        // Mostrar vista previa
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            previewImg.src = event.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // Si no hay archivo seleccionado pero hay imagen existente, mantener la vista previa
+        if (!hasExistingImage) {
+            preview.style.display = 'none';
+        }
+        currentImageFile = null;
+    }
+});
+
+// Manejar eliminación de imagen
+document.getElementById('remove-image').addEventListener('click', function() {
+    document.getElementById('news-image').value = '';
+    document.getElementById('image-preview').style.display = 'none';
+    currentImageFile = null;
+    hasExistingImage = false;
+});
+
+// Cargar noticia si hay ID en la URL (modo edición)
+const urlParams = new URLSearchParams(window.location.search);
+const newsId = urlParams.get('id');
+
+if (newsId) {
+    console.log('Modo edición - ID de noticia:', newsId);
+    document.getElementById('editor-title').textContent = 'Editar Noticia';
+    document.getElementById('submit-text').textContent = 'Actualizar Noticia';
+    document.getElementById('news-image').required = false; // En edición, la imagen no es requerida
+    
+    // Cargar datos de la noticia
+    fetch(`api/noticias.php?id=${newsId}`)
+        .then(response => {
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('Error response text:', text);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                });
+            }
+            
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    console.error('Non-JSON response:', text);
+                    throw new Error('La respuesta del servidor no es JSON válido');
+                });
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('Datos recibidos:', data);
+            
+            if (data.success && data.data) {
+                const noticia = data.data;
+                document.getElementById('news-id').value = noticia.id;
+                document.getElementById('news-title').value = noticia.titulo;
+                document.getElementById('news-date').value = noticia.fecha;
+                document.getElementById('news-summary').value = noticia.resumen;
+                document.getElementById('news-content').value = noticia.contenido;
+                
+                // Actualizar contador de caracteres
+                document.getElementById('summary-chars').textContent = noticia.resumen ? noticia.resumen.length : 0;
+                
+                // Mostrar imagen existente si hay una (desde base64)
+                if (noticia.imagen_base64) {
+                    const preview = document.getElementById('image-preview');
+                    const previewImg = document.getElementById('preview-img');
+                    previewImg.src = 'data:image/jpeg;base64,' + noticia.imagen_base64;
+                    preview.style.display = 'block';
+                    hasExistingImage = true;
+                    console.log('Imagen existente cargada');
+                }
+            } else {
+                throw new Error(data.error || 'Noticia no encontrada');
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando noticia:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo cargar la noticia: ' + error.message
+            }).then(() => {
+                window.location.href = 'admin.html';
+            });
+        });
+}
+
+// Manejar envío del formulario
+document.getElementById('news-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = this;
+    const submitBtn = document.getElementById('submit-btn');
+    const submitText = document.getElementById('submit-text');
+    const originalText = submitBtn.innerHTML;
+    
+    // Validaciones básicas
+    const title = document.getElementById('news-title').value.trim();
+    const date = document.getElementById('news-date').value;
+    const summary = document.getElementById('news-summary').value.trim();
+    const content = document.getElementById('news-content').value.trim();
+    const newsId = document.getElementById('news-id').value;
+    
+    console.log('Enviando formulario - ID:', newsId, 'Modo:', newsId ? 'Edición' : 'Creación');
+    
+    if (!title || !date || !summary || !content) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Todos los campos son requeridos'
+        });
+        return;
+    }
+    
+    // En creación, validar que hay imagen
+    const isEdit = !!newsId;
+    if (!isEdit && !currentImageFile) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe seleccionar una imagen para la noticia'
+        });
+        return;
+    }
+    
+    try {
+        // Mostrar loading
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (isEdit ? 'Actualizando...' : 'Guardando...');
+        submitBtn.disabled = true;
+        
+        // Preparar FormData para enviar la imagen
+        const formData = new FormData();
+        formData.append('titulo', title);
+        formData.append('fecha', date);
+        formData.append('resumen', summary);
+        formData.append('contenido', content);
+        
+        if (currentImageFile) {
+            formData.append('imagen', currentImageFile);
+            console.log('Imagen incluida en el envío');
+        } else {
+            console.log('No hay imagen nueva, se mantendrá la existente');
+        }
+        
+        if (isEdit) {
+            formData.append('id', newsId);
+            console.log('Enviando en modo EDICIÓN');
+        } else {
+            console.log('Enviando en modo CREACIÓN');
+        }
+        
+        const response = await fetch('api/noticias.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response text:', errorText);
+            
+            try {
+                const errorData = JSON.parse(errorText);
+                throw new Error(errorData.error || errorData.message || `Error HTTP: ${response.status}`);
+            } catch (e) {
+                throw new Error(`Error del servidor: ${response.status} - ${errorText.substring(0, 100)}`);
+            }
+        }
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (data.success) {
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: isEdit ? 'Noticia actualizada correctamente' : 'Noticia creada correctamente',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            
+            window.location.href = 'admin.html';
+        } else {
+            throw new Error(data.error || data.message || 'Error al guardar la noticia');
+        }
+        
+    } catch (error) {
+        console.error('Error guardando noticia:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al guardar la noticia: ' + error.message
+        });
+    } finally {
+        // Restaurar botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+</script>
+    <script>
+        // Cargar navbar
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+                // Inicializar navbar
+                initializeNavbar();
+            })
+            .catch(error => {
+                console.error('Error cargando navbar:', error);
+            });
+
+        function initializeNavbar() {
+            // Función para mostrar/ocultar enlaces según rol
+            function updateNavbarByRole(role) {
+                const adminLink = document.querySelector('a[href="admin.html"]');
+                const controlFlujoLink = document.querySelector('a[href="control-flujo.html"]');
+                const usuariosLink = document.getElementById('usuarios-link');
+                const credencialesLink = document.querySelector('a[href="credenciales.html"]');
+                const politicasLink = document.getElementById('ver-politicas-link');
+                const correoLink = document.querySelector('a[href="https://correo.codehciu.org"]');
+
+                // Ocultar todos inicialmente
+                if (adminLink) adminLink.parentElement.style.display = 'none';
+                if (controlFlujoLink) controlFlujoLink.parentElement.style.display = 'none';
+                if (usuariosLink) usuariosLink.style.display = 'none';
+
+                // Mostrar según rol
+                switch (role) {
+                    case 'admin':
+                    case 'administrador':
+                        if (adminLink) adminLink.parentElement.style.display = 'list-item';
+                        if (controlFlujoLink) controlFlujoLink.parentElement.style.display = 'list-item';
+                        if (usuariosLink) usuariosLink.style.display = 'list-item';
+                        break;
+                    case 'editor':
+                        if (adminLink) adminLink.parentElement.style.display = 'list-item';
+                        break;
+                    case 'contab':
+                    case 'contador':
+                        if (controlFlujoLink) controlFlujoLink.parentElement.style.display = 'list-item';
+                        break;
+                    default:
+                        // Usuario regular
+                        break;
+                }
+
+                // Todos los usuarios pueden ver credenciales, políticas y correo
+                if (credencialesLink) credencialesLink.parentElement.style.display = 'list-item';
+                if (politicasLink) politicasLink.parentElement.style.display = 'list-item';
+                if (correoLink) correoLink.parentElement.style.display = 'list-item';
+            }
+
+            // Verificar sesión y rol
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (!user) {
+                window.location.href = 'index.html';
+            } else {
+                // Solo administradores pueden ver esta página
+                if (user.role !== 'admin' && user.role !== 'administrador') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Acceso denegado',
+                        text: 'Solo los administradores pueden acceder a esta página.',
+                        willClose: () => {
+                            window.location.href = 'inicio.html';
+                        }
+                    });
+                    return;
+                }
+
+                document.getElementById('username').textContent = user.name;
+
+                // Actualizar navbar según rol
+                updateNavbarByRole(user.role);
+
+                // Forzar mostrar enlace de usuarios (ya que estamos en la página de usuarios)
+                const usuariosLink = document.getElementById('usuarios-link');
+                if (usuariosLink) {
+                    usuariosLink.style.display = 'list-item';
+                }
+            }
+
+            // Botón cerrar sesión
+            document.getElementById('logout-btn').addEventListener('click', function () {
+                Swal.fire({
+                    title: '¿Cerrar sesión?',
+                    text: '¿Estás seguro de que quieres salir del sistema?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, cerrar sesión',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('user');
+                        window.location.href = 'index.html';
+                    }
+                });
+            });
+
+            // Toggle menú hamburguesa
+            document.querySelector('.menu-toggle').addEventListener('click', function () {
+                const navContainer = document.querySelector('.nav-container');
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !isExpanded);
+                navContainer.classList.toggle('active');
+            });
+
+            // Enlace ver políticas
+            document.getElementById('ver-politicas-link').addEventListener('click', function (e) {
+                e.preventDefault();
+                const politicasModal = document.getElementById('politicasModal');
+                if (politicasModal && typeof window.initPoliticasModal === 'function') {
+                    politicasModal.style.display = 'block';
+                }
+            });
+        }
+
+        // Cargar el modal de políticas
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('politicas-modal.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('politicas-modal-container').innerHTML = data;
+                    if (typeof initPoliticasModal === 'function') {
+                        setTimeout(initPoliticasModal, 100);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando el modal de políticas:', error);
+                });
+        });
+
+        // Cargar formulario externo con fetch
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('user-form.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('user-form-container').innerHTML = html;
+
+                    // Inicializar la gestión de usuarios después de cargar el formulario
+                    if (typeof initUserManagement === 'function') {
+                        initUserManagement();
+                    }
+                })
+                .catch(error => console.error('Error cargando formulario:', error));
+
+            // Inicializar modal de cambio de contraseña
+            if (typeof initChangePasswordModal === 'function') {
+                initChangePasswordModal();
+            }
+        });
+
+        // Inicializar eventos de modales
+        document.addEventListener('DOMContentLoaded', function () {
+            // Cerrar modales al hacer clic en la X
+            document.querySelectorAll('.close-modal').forEach(closeBtn => {
+                closeBtn.addEventListener('click', function () {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+
+            // Cerrar modales al hacer clic fuera del contenido
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
