@@ -1,6 +1,7 @@
 <?php
 /**
  * API para Cerrar Solicitud de Compra y su Orden de Compra asociada
+ * MODIFICADO: Soporte para moneda y tasa de cambio
  */
 
 header('Content-Type: application/json');
@@ -43,6 +44,20 @@ $solicitud_id = $input['solicitud_id'] ?? 0;
 $observaciones = $input['observaciones'] ?? '';
 $concepto_personalizado = $input['concepto'] ?? '';
 
+// ✅ NUEVOS CAMPOS: moneda y tasa de cambio
+$moneda_pago = $input['moneda'] ?? 'USD';
+$tasa_cambio = isset($input['tasa_cambio']) ? floatval($input['tasa_cambio']) : 1.0000;
+
+// Validar moneda
+if (!in_array($moneda_pago, ['USD', 'BS', 'EUR'])) {
+    $moneda_pago = 'USD';
+}
+
+// Validar tasa de cambio (mínimo 0.0001)
+if ($tasa_cambio <= 0) {
+    $tasa_cambio = 1.0000;
+}
+
 if (!$solicitud_id) {
     echo json_encode(['success' => false, 'message' => 'ID de solicitud no proporcionado']);
     exit;
@@ -77,16 +92,16 @@ try {
     $numero_documento = $solicitud['numero_transferencia'] ?? 'OC-' . $solicitud['codigo_oc'];
     $descripcion_egreso = "Egreso vinculado a OC {$solicitud['codigo_oc']} - {$observaciones}";
     
-    // Crear egreso
+    // ✅ CORREGIDO: Usar moneda y tasa_cambio en el INSERT
     $egreso_query = "
         INSERT INTO transacciones (
-            proyecto_id, partida_id, banco_id, tipo, monto, moneda, concepto,
+            proyecto_id, partida_id, banco_id, tipo, monto, moneda, tasa_cambio, concepto,
             fecha_transaccion, numero_documento, beneficiario, descripcion,
-            metodo_pago, status, created_by, solicitud_id
+            metodo_pago, status, created_by
         ) VALUES (
-            :proyecto_id, :partida_id, :banco_id, 'Egreso', :monto, 'USD', :concepto,
+            :proyecto_id, :partida_id, :banco_id, 'Egreso', :monto, :moneda, :tasa_cambio, :concepto,
             CURDATE(), :numero_documento, :beneficiario, :descripcion,
-            'Transferencia', 'Completado', :created_by, :solicitud_id
+            'Transferencia', 'Completado', :created_by
         )
     ";
     
@@ -94,30 +109,51 @@ try {
     $egreso_stmt->execute([
         ':proyecto_id' => $solicitud['proyecto_id'],
         ':partida_id' => $solicitud['partida_id'],
-        ':banco_id' => $solicitud['banco_origen_id'],
+        ':banco_id' => $solicitud['banco_origen_id'] ?? 1,
         ':monto' => $solicitud['monto_pagado'],
+        ':moneda' => $moneda_pago,
+        ':tasa_cambio' => $tasa_cambio,
         ':concepto' => $concepto,
         ':numero_documento' => $numero_documento,
         ':beneficiario' => $solicitud['beneficiario'],
         ':descripcion' => $descripcion_egreso,
-        ':created_by' => $usuario_id,
-        ':solicitud_id' => $solicitud_id
+        ':created_by' => $usuario_id
     ]);
     
     $transaccion_id = $pdo->lastInsertId();
     
+    // Actualizar saldo de la partida
+    $update_saldo = $pdo->prepare("
+        UPDATE partidas 
+        SET presupuesto_actual = presupuesto_actual - ? 
+        WHERE id = ?
+    ");
+    $update_saldo->execute([$solicitud['monto_pagado'], $solicitud['partida_id']]);
+    
     // Cerrar solicitud
-    $update_solicitud = $pdo->prepare("UPDATE solicitudes_compras SET estado = 'Cerrada' WHERE id = :id");
+    $update_solicitud = $pdo->prepare("
+        UPDATE solicitudes_compras 
+        SET estado = 'Cerrada', updated_at = NOW() 
+        WHERE id = :id
+    ");
     $update_solicitud->execute([':id' => $solicitud_id]);
     
     // Cerrar orden de compra
     if ($solicitud['oc_id']) {
-        $update_oc = $pdo->prepare("UPDATE ordenes_compra SET estado = 'Cerrada' WHERE id = :id");
+        $update_oc = $pdo->prepare("
+            UPDATE ordenes_compra 
+            SET estado = 'Cerrada' 
+            WHERE id = :id
+        ");
         $update_oc->execute([':id' => $solicitud['oc_id']]);
     }
     
-    // Actualizar pago
-    $update_pago = $pdo->prepare("UPDATE pagos_solicitud SET transaccion_id = :trans_id WHERE solicitud_id = :sol_id");
+    // Actualizar pago con la transacción generada
+    $update_pago = $pdo->prepare("
+        UPDATE pagos_solicitud 
+        SET transaccion_id = :trans_id 
+        WHERE solicitud_id = :sol_id
+    ");
     $update_pago->execute([
         ':trans_id' => $transaccion_id,
         ':sol_id' => $solicitud_id
@@ -128,7 +164,7 @@ try {
         INSERT INTO historial_solicitud (solicitud_id, usuario_id, estado_anterior, estado_nuevo, comentario)
         VALUES (:id, :usuario, 'Pagada', 'Cerrada', :comentario)
     ");
-    $comentario_cierre = "Solicitud cerrada. OC: {$solicitud['codigo_oc']}. Egreso #$transaccion_id. " . $observaciones;
+    $comentario_cierre = "Solicitud cerrada. OC: {$solicitud['codigo_oc']}. Egreso #$transaccion_id. Moneda: $moneda_pago, Tasa: $tasa_cambio. " . $observaciones;
     $historial->execute([
         ':id' => $solicitud_id,
         ':usuario' => $usuario_id,
@@ -141,11 +177,14 @@ try {
         'success' => true,
         'message' => 'Solicitud y Orden de Compra cerradas exitosamente',
         'transaccion_id' => $transaccion_id,
-        'orden_compra' => $solicitud['codigo_oc']
+        'orden_compra' => $solicitud['codigo_oc'],
+        'moneda' => $moneda_pago,
+        'tasa_cambio' => $tasa_cambio
     ]);
     
 } catch (Exception $e) {
     if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
+    error_log("Error en cerrar_solicitud.php: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
 ?>

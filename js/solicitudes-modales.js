@@ -133,6 +133,25 @@ const solicitudesModales = (function () {
                 seleccionarGanadorCotizacion(btnCotizacion.dataset.id);
             }
         });
+
+        // ✅ Evento para mostrar/ocultar tasa de cambio según moneda (para compras)
+        document.getElementById('cerrar-moneda')?.addEventListener('change', function () {
+            const container = document.getElementById('cerrar-tasa-container');
+            const tasaInput = document.getElementById('cerrar-tasa-cambio');
+            if (container) {
+                if (this.value === 'BS') {
+                    container.style.display = 'block';
+                    if (tasaInput) tasaInput.required = true;
+                } else {
+                    container.style.display = 'block'; // Siempre visible
+                    if (tasaInput) {
+                        tasaInput.required = false;
+                        tasaInput.value = '';
+                    }
+                }
+            }
+        });
+
     }
 
     // ========== VALIDACIONES ==========
@@ -859,6 +878,10 @@ const solicitudesModales = (function () {
         document.getElementById('cerrar-solicitud-id').value = id;
         document.getElementById('cerrar-concepto').value = '';
         document.getElementById('cerrar-observaciones').value = '';
+        // ✅ Resetear campos de moneda y tasa
+        document.getElementById('cerrar-moneda').value = 'USD';
+        document.getElementById('cerrar-tasa-cambio').value = '';
+        document.getElementById('cerrar-tasa-container').style.display = 'block';
         obtenerInfoSolicitudParaCierre(id);
         modalInstances['modal-cerrar-solicitud']?.show();
     }
@@ -879,17 +902,47 @@ const solicitudesModales = (function () {
         const id = document.getElementById('cerrar-solicitud-id').value;
         const concepto = document.getElementById('cerrar-concepto').value;
         const observaciones = document.getElementById('cerrar-observaciones').value;
+
+        // ✅ OBTENER MONEDA Y TASA DE CAMBIO
+        const moneda = document.getElementById('cerrar-moneda')?.value || 'USD';
+        const tasaCambio = parseFloat(document.getElementById('cerrar-tasa-cambio')?.value) || 1.0000;
+
         if (!concepto) return Swal.fire({ icon: 'warning', title: 'Concepto requerido' });
+
+        // ✅ VALIDAR TASA DE CAMBIO SI ES BOLÍVARES
+        if (moneda === 'BS' && tasaCambio <= 0) {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'Tasa de cambio requerida',
+                text: 'Debe ingresar la tasa de cambio para pagos en Bolívares (BS)'
+            });
+        }
+
         Swal.fire({
             title: 'Cerrar solicitud',
-            html: `<p>¿Está seguro de cerrar esta solicitud?</p><p><strong>Concepto:</strong> ${concepto}</p>`,
+            html: `
+            <p>¿Está seguro de cerrar esta solicitud?</p>
+            <p><strong>Concepto:</strong> ${concepto}</p>
+            <p><strong>Moneda:</strong> ${moneda}</p>
+            ${moneda === 'BS' ? `<p><strong>Tasa de Cambio:</strong> ${tasaCambio.toFixed(4)} Bs/USD</p>` : ''}
+        `,
             icon: 'question',
             showCancelButton: true
         }).then(async (result) => {
             if (!result.isConfirmed) return;
             Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
-                const res = await fetch('./api/cerrar_solicitud.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ solicitud_id: id, observaciones, concepto }) });
+                const res = await fetch('./api/cerrar_solicitud.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        solicitud_id: id,
+                        observaciones,
+                        concepto,
+                        moneda: moneda,
+                        tasa_cambio: tasaCambio
+                    })
+                });
                 const data = await res.json();
                 Swal.close();
                 if (data.success) {

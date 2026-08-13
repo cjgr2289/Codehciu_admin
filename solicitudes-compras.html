@@ -367,25 +367,60 @@
     </div>
 </div>
 
-    <!-- MODAL: Cerrar Solicitud -->
-    <div class="modal fade" id="modal-cerrar-solicitud" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-secondary text-white"><h5><i class="fas fa-lock"></i> Cerrar Solicitud</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body">
-                    <p>¿Estás seguro de que deseas cerrar esta solicitud?</p>
-                    <form id="form-cerrar-solicitud">
-                        <input type="hidden" id="cerrar-solicitud-id">
-                        <div class="mb-3"><label>Concepto del egreso *</label><input type="text" class="form-control" id="cerrar-concepto" required></div>
-                        <div class="mb-3"><label>Observaciones finales</label><textarea class="form-control" id="cerrar-observaciones" rows="2"></textarea></div>
-                        <div class="alert alert-info"><i class="fas fa-info-circle"></i> Se creará un registro de egreso vinculado a la Orden de Compra.</div>
-                    </form>
-                </div>
-                <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-cierre">Cerrar Solicitud</button></div>
+<!-- MODAL: Cerrar Solicitud -->
+<div class="modal fade" id="modal-cerrar-solicitud" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+                <h5><i class="fas fa-lock"></i> Cerrar Solicitud</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas cerrar esta solicitud?</p>
+                <form id="form-cerrar-solicitud">
+                    <input type="hidden" id="cerrar-solicitud-id">
+
+                    <div class="mb-3">
+                        <label>Concepto del egreso *</label>
+                        <input type="text" class="form-control" id="cerrar-concepto" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Observaciones finales</label>
+                        <textarea class="form-control" id="cerrar-observaciones" rows="2"></textarea>
+                    </div>
+
+                    <!-- ✅ NUEVOS CAMPOS: Moneda y Tasa de Cambio -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label>Moneda de Pago *</label>
+                            <select class="form-control" id="cerrar-moneda" required>
+                                <option value="USD">🇺🇸 Dólar (USD)</option>
+                                <option value="BS">🇻🇪 Bolívar (BS)</option>
+                                <option value="EUR">🇪🇺 Euro (EUR)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="cerrar-tasa-container">
+                            <label>Tasa de Cambio (Bs/USD)</label>
+                            <input type="number" class="form-control" id="cerrar-tasa-cambio" step="0.0001" min="0"
+                                placeholder="Ej: 480.25">
+                            <small class="text-muted">Requerido solo si el pago fue en Bolívares</small>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Se creará un registro de egreso vinculado a la Orden de
+                        Compra con la moneda y tasa de cambio indicadas.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary" id="btn-confirmar-cierre">Cerrar Solicitud</button>
             </div>
         </div>
     </div>
-
+</div>
     <!-- MODAL: Ver Comprobante -->
     <div class="modal fade" id="modal-ver-comprobante" tabindex="-1"><div class="modal-dialog modal-md"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5><i class="fas fa-image"></i> Comprobante de Pago</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body text-center"><img id="comprobante-imagen" src="" class="img-fluid"></div></div></div></div>
 
