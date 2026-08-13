@@ -1,0 +1,150 @@
+/* ========================================== */
+/* BOTÓN FLOTANTE (FAB)                       */
+/* ========================================== */
+.fab-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+}
+
+.fab-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.fab-button:hover {
+    transform: scale(1.05);
+    background-color: #e0a800;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.fab-button i {
+    font-size: 24px;
+    transition: transform 0.3s ease;
+}
+
+.fab-container.open .fab-button i {
+    transform: rotate(45deg);
+}
+
+.fab-options {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.fab-container.open .fab-options {
+    visibility: visible;
+    opacity: 1;
+    bottom: 75px;
+}
+
+.fab-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    padding: 8px 16px 8px 12px;
+    border-radius: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    border: none;
+}
+
+.fab-option:hover {
+    transform: translateX(-5px);
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.fab-option i {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 16px;
+}
+
+.fab-option i.fa-plus-circle {
+    background: #ffc107;
+    color: #212529;
+}
+
+.fab-option i.fa-file-download {
+    background: #343a40;
+    color: white;
+}
+
+.fab-option i.fa-money-bill-wave {
+    background: #0dcaf0;
+    color: white;
+}
+
+.fab-option i.fa-money-bill-wave-alt {
+    background: #dc3545;
+    color: white;
+}
+
+.fab-option i.fa-shopping-cart {
+    background: #ffc107;
+    color: #212529;
+}
+
+.fab-option i.fa-hand-holding-usd {
+    background: #198754;
+    color: white;
+}
+
+/* ========================================== */
+/* RESPONSIVE FAB                            */
+/* ========================================== */
+@media (max-width: 768px) {
+    .fab-container {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .fab-button {
+        width: 50px;
+        height: 50px;
+    }
+
+    .fab-button i {
+        font-size: 20px;
+    }
+
+    .fab-option {
+        font-size: 12px;
+        padding: 6px 12px 6px 10px;
+    }
+
+    .fab-option i {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+}

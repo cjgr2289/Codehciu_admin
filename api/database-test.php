@@ -5,10 +5,10 @@
 
 // Configuración de la base de datos
 $dbConfig = [
-    'host' => '148.72.3.93',
+    'host' => 'localhost',
     'dbname' => 'sistema_noticias',
-    'username' => 'admincodehciu',
-    'password' => 'C0d3hc1u.25*',
+    'username' => 'root',
+    'password' => '',
     'charset' => 'utf8mb4',
     'options' => [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
