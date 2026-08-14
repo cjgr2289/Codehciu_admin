@@ -2,7 +2,7 @@
 /**
  * API para Aprobar/Rechazar Solicitud de Pago
  * CODEHCIU - Sistema de Finanzas
- * VERSIÓN SIMPLIFICADA
+ * Genera Orden de Pago (OP) al aprobar
  */
 
 header('Content-Type: application/json');
@@ -59,7 +59,12 @@ try {
     $pdo->beginTransaction();
     
     // Obtener estado actual
-    $check = $pdo->prepare("SELECT estado, solicitante_id, codigo_solicitud, concepto FROM solicitudes_pagos WHERE id = ?");
+    $check = $pdo->prepare("
+        SELECT sp.*, p.nombre as proyecto_nombre 
+        FROM solicitudes_pagos sp
+        LEFT JOIN proyectos p ON sp.proyecto_id = p.id
+        WHERE sp.id = ?
+    ");
     $check->execute([$solicitud_id]);
     $solicitud = $check->fetch();
     
@@ -73,18 +78,58 @@ try {
     
     $estado_anterior = $solicitud['estado'];
     
-    // ✅ VERSIÓN SIMPLIFICADA - Actualizar en dos pasos
-    // Paso 1: Actualizar estado
-    $update = $pdo->prepare("UPDATE solicitudes_pagos SET estado = ? WHERE id = ?");
-    $update->execute([$decision, $solicitud_id]);
+    // ✅ Generar código de Orden de Pago (OP) si es aprobada
+    $codigo_op = null;
+    $numero_op = null;
     
-    // Paso 2: Actualizar fecha de aprobación si es necesario
     if ($decision === 'Aprobada') {
-        $updateFecha = $pdo->prepare("UPDATE solicitudes_pagos SET fecha_aprobacion = CURDATE() WHERE id = ?");
-        $updateFecha->execute([$solicitud_id]);
+        $anio = date('Y');
+        $proyecto_id = $solicitud['proyecto_id'];
+        $prefijo = 'OP-CGE-PAY-' . $proyecto_id . '-' . $anio . '-';
+        
+        $query = "SELECT COUNT(*) as total FROM solicitudes_pagos WHERE codigo_op LIKE ?";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$prefijo . '%']);
+        $row = $stmt->fetch();
+        $numero = ($row['total'] ?? 0) + 1;
+        $correlativo = str_pad($numero, 6, '0', STR_PAD_LEFT);
+        $codigo_op = $prefijo . $correlativo;
+        $numero_op = $correlativo;
     }
     
-    // ✅ Historial con marcadores ?
+    // ✅ CORREGIDO: UPDATE simple sin IF anidado
+    if ($decision === 'Aprobada') {
+        $update = $pdo->prepare("
+            UPDATE solicitudes_pagos 
+            SET estado = ?,
+                fecha_aprobacion = CURDATE(),
+                codigo_op = ?,
+                numero_op = ?
+            WHERE id = ?
+        ");
+        $update->execute([
+            $decision,
+            $codigo_op,
+            $numero_op,
+            $solicitud_id
+        ]);
+    } else {
+        // Rechazada - solo cambia estado y limpia campos de OP
+        $update = $pdo->prepare("
+            UPDATE solicitudes_pagos 
+            SET estado = ?,
+                fecha_aprobacion = NULL,
+                codigo_op = NULL,
+                numero_op = NULL
+            WHERE id = ?
+        ");
+        $update->execute([
+            $decision,
+            $solicitud_id
+        ]);
+    }
+    
+    // Historial
     $historial = $pdo->prepare("
         INSERT INTO historial_pagos (solicitud_id, usuario_id, estado_anterior, estado_nuevo, comentario)
         VALUES (?, ?, ?, ?, ?)
@@ -94,18 +139,23 @@ try {
         $usuario_id,
         $estado_anterior,
         $decision,
-        $comentario ?: ($decision === 'Aprobada' ? 'Aprobada' : 'Rechazada')
+        $comentario ?: ($decision === 'Aprobada' ? 'Aprobada - OP: ' . $codigo_op : 'Rechazada')
     ]);
     
     $pdo->commit();
     
-    // Enviar notificación al solicitante
+    // Enviar notificación
     $solicitante = $pdo->prepare("SELECT email, nombre FROM usuarios WHERE id = ?");
     $solicitante->execute([$solicitud['solicitante_id']]);
     $user = $solicitante->fetch();
     
     $estado_texto = $decision === 'Aprobada' ? 'APROBADA' : 'RECHAZADA';
     $asunto = "Solicitud de Pago {$estado_texto} - {$solicitud['codigo_solicitud']}";
+    
+    $info_adicional = '';
+    if ($decision === 'Aprobada' && $codigo_op) {
+        $info_adicional = "<p><strong>Orden de Pago:</strong> {$codigo_op}</p>";
+    }
     
     $cuerpo = "
         <div style='font-family: Arial, sans-serif; max-width: 600px;'>
@@ -115,7 +165,9 @@ try {
             <div style='padding: 20px; border: 1px solid #dee2e6; border-top: none;'>
                 <p><strong>Código:</strong> {$solicitud['codigo_solicitud']}</p>
                 <p><strong>Concepto:</strong> {$solicitud['concepto']}</p>
-                <p><strong>Estado:</strong> {$decision}</p>
+                <p><strong>Beneficiario:</strong> {$solicitud['beneficiario']}</p>
+                <p><strong>Monto:</strong> $ " . number_format($solicitud['monto_solicitado'], 2, ',', '.') . "</p>
+                {$info_adicional}
                 " . ($comentario ? "<p><strong>Comentario:</strong> {$comentario}</p>" : "") . "
             </div>
         </div>
@@ -127,7 +179,9 @@ try {
     
     echo json_encode([
         'success' => true,
-        'message' => "Solicitud de pago {$decision} exitosamente"
+        'message' => "Solicitud de pago {$decision} exitosamente",
+        'codigo_op' => $codigo_op,
+        'numero_op' => $numero_op
     ]);
     
 } catch (Exception $e) {

@@ -258,6 +258,13 @@ const solicitudesPagos = (function () {
             botones += `<button class="btn btn-sm btn-success btn-registrar-pago-pago" data-id="${solicitud.id}" title="Registrar pago"><i class="fas fa-money-bill-wave"></i></button>`;
         }
 
+        // ✅ BOTÓN PARA VER ORDEN DE PAGO (cuando está aprobada y tiene OP)
+        if (estado === 'Aprobada' || estado === 'Pagada' || estado === 'Cerrada') {
+            if (solicitud.codigo_op) {
+                botones += `<button class="btn btn-sm btn-primary btn-ver-op" data-id="${solicitud.id}" title="Ver Orden de Pago"><i class="fas fa-file-invoice"></i></button>`;
+            }
+        }
+
         if (tieneRol(['admin', 'contab']) && estado === 'Pagada') {
             botones += `<button class="btn btn-sm btn-secondary btn-cerrar-pago" data-id="${solicitud.id}" title="Cerrar solicitud"><i class="fas fa-lock"></i></button>`;
         }
@@ -310,6 +317,12 @@ const solicitudesPagos = (function () {
         } else if (target.classList.contains('btn-cerrar-pago')) {
             e.preventDefault();
             mostrarModalCierre(id);
+        } else if (target.classList.contains('btn-ver-op')) {
+            e.preventDefault();
+            // ✅ LLAMAR A LA FUNCIÓN DE ORDEN DE PAGO
+            if (window.solicitudesPagosModales && window.solicitudesPagosModales.mostrarOrdenPago) {
+                window.solicitudesPagosModales.mostrarOrdenPago(id);
+            }
         }
     }
 

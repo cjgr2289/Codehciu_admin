@@ -31,7 +31,8 @@ const solicitudesPagosModales = (function () {
     function inicializarModales() {
         const modales = [
             'modal-nueva-solicitud-pago', 'modal-ver-solicitud-pago', 'modal-aprobar-solicitud-pago',
-            'modal-registrar-pago-pago', 'modal-cerrar-solicitud-pago', 'modal-ver-comprobante-pago'
+            'modal-registrar-pago-pago', 'modal-cerrar-solicitud-pago', 'modal-ver-comprobante-pago',
+            'modal-reporte-op'
         ];
         modales.forEach(id => {
             const el = document.getElementById(id);
@@ -95,6 +96,35 @@ const solicitudesPagosModales = (function () {
                     document.getElementById('cerrar-tasa-cambio-pago').required = false;
                     document.getElementById('cerrar-tasa-cambio-pago').value = '';
                 }
+            }
+        });
+
+        // Evento para imprimir Orden de Pago
+        document.getElementById('btn-imprimir-op')?.addEventListener('click', function () {
+            const content = document.getElementById('reporte-op-content');
+            if (content) {
+                const ventana = window.open('', '_blank');
+                ventana.document.write(`
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Orden de Pago</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { margin: 0; padding: 20px; font-family: 'Segoe UI', Arial, sans-serif; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { padding: 5px; border: 1px solid #ddd; text-align: left; }
+                        @media print {
+                            body { padding: 10px; }
+                            .no-print { display: none !important; }
+                        }
+                    </style>
+                </head>
+                <body>${content.innerHTML}</body>
+            </html>
+        `);
+                ventana.document.close();
+                setTimeout(() => ventana.print(), 500);
             }
         });
     }
@@ -848,6 +878,29 @@ const solicitudesPagosModales = (function () {
         const historial = s.historial || [];
         const detalles = s.detalles || [];
 
+        // ✅ SECCIÓN DE ORDEN DE PAGO
+        let opHtml = '';
+        if (s.codigo_op) {
+            opHtml = `
+            <div class="alert alert-success mt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong><i class="fas fa-file-invoice"></i> Orden de Pago:</strong> ${s.codigo_op}<br>
+                        <small>Fecha de Aprobación: ${formatearFechaLocal(s.fecha_aprobacion, 'largo')}</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-primary me-1" onclick="solicitudesPagosModales.mostrarOrdenPago(${s.id})">
+                            <i class="fas fa-eye"></i> Ver OP
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="solicitudesPagosModales.imprimirOrdenPago(${s.id})">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        }
+
         let detallesHtml = '';
         if (detalles && detalles.length) {
             let rows = '';
@@ -855,27 +908,27 @@ const solicitudesPagosModales = (function () {
                 rows += `<tr><td>${d.descripcion}</td><td>$${parseFloat(d.monto).toFixed(2)}</td><td>${d.periodo || '-'}</td></tr>`;
             });
             detallesHtml = `
-                <h6 class="mt-3"><i class="fas fa-list"></i> Detalles del Pago</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                        <thead><tr><th>Descripción</th><th>Monto</th><th>Período</th></tr></thead>
-                        <tbody>${rows}</tbody>
-                        <tfoot><tr style="font-weight:bold;"><td>TOTAL</td><td>$${parseFloat(s.monto_solicitado).toFixed(2)}</td><td></td></tr></tfoot>
-                    </table>
-                </div>
-            `;
+            <h6 class="mt-3"><i class="fas fa-list"></i> Detalles del Pago</h6>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                    <thead><tr><th>Descripción</th><th>Monto</th><th>Período</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                    <tfoot><tr style="font-weight:bold;"><td>TOTAL</td><td>$${parseFloat(s.monto_solicitado).toFixed(2)}</td><td></td></tr></tfoot>
+                </table>
+            </div>
+        `;
         }
 
         let honorariosHtml = '';
         if (s.es_honorario) {
             honorariosHtml = `
-                <div class="alert alert-info mt-3">
-                    <i class="fas fa-user-tie"></i> <strong>Pago de Honorarios</strong><br>
-                    <small>Usuario: ${s.usuario_beneficiario_nombre || s.beneficiario}</small><br>
-                    <small>Tipo de Contrato: ${s.tipo_contrato || 'No especificado'}</small><br>
-                    <small>Monto: $${parseFloat(s.monto_honorarios || s.monto_solicitado).toFixed(2)}</small>
-                </div>
-            `;
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-user-tie"></i> <strong>Pago de Honorarios</strong><br>
+                <small>Usuario: ${s.usuario_beneficiario_nombre || s.beneficiario}</small><br>
+                <small>Tipo de Contrato: ${s.tipo_contrato || 'No especificado'}</small><br>
+                <small>Monto: $${parseFloat(s.monto_honorarios || s.monto_solicitado).toFixed(2)}</small>
+            </div>
+        `;
         }
 
         let historialHtml = '';
@@ -894,14 +947,14 @@ const solicitudesPagosModales = (function () {
                 histRows += `<tr><td>${fecha}</td><td>${h.usuario_nombre || 'Sistema'}</td><td><span class="badge ${badgeColor}">${estadoNuevo}</span></td><td>${h.comentario || 'Sin comentario'}</td></tr>`;
             });
             historialHtml = `
-                <h6 class="mt-3"><i class="fas fa-history"></i> Historial</h6>
-                <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
-                    <table class="table table-sm table-bordered">
-                        <thead><tr><th>Fecha</th><th>Usuario</th><th>Estado</th><th>Comentario</th></tr></thead>
-                        <tbody>${histRows}</tbody>
-                    </table>
-                </div>
-            `;
+            <h6 class="mt-3"><i class="fas fa-history"></i> Historial</h6>
+            <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
+                <table class="table table-sm table-bordered">
+                    <thead><tr><th>Fecha</th><th>Usuario</th><th>Estado</th><th>Comentario</th></tr></thead>
+                    <tbody>${histRows}</tbody>
+                </table>
+            </div>
+        `;
         }
 
         const estadoBadge = {
@@ -914,29 +967,30 @@ const solicitudesPagosModales = (function () {
         };
 
         return `
-            <div class="detalles-header">
-                <h4>${s.codigo_solicitud}</h4>
-                <p>${s.concepto}</p>
-                <span class="${estadoBadge[s.estado] || 'badge bg-secondary'}">${s.estado || 'Pendiente'}</span>
+        <div class="detalles-header">
+            <h4>${s.codigo_solicitud}</h4>
+            <p>${s.concepto}</p>
+            <span class="${estadoBadge[s.estado] || 'badge bg-secondary'}">${s.estado || 'Pendiente'}</span>
+        </div>
+        <div class="detalles-info">
+            <div class="info-grid">
+                <div><strong>Solicitante:</strong> ${s.solicitante_nombre}</div>
+                <div><strong>Fecha:</strong> ${formatearFechaLocal(s.fecha_solicitud, 'corto')}</div>
+                <div><strong>Proyecto:</strong> ${s.proyecto_nombre}</div>
+                <div><strong>Monto:</strong> $${parseFloat(s.monto_solicitado).toFixed(2)}</div>
+                <div><strong>Beneficiario:</strong> ${s.beneficiario}</div>
+                <div><strong>Prioridad:</strong> ${s.prioridad || 'Media'}</div>
+                <div><strong>Forma de Pago:</strong> ${s.forma_pago || 'Transferencia'}</div>
+                <div><strong>Fecha Requerida:</strong> ${formatearFechaLocal(s.fecha_requerida, 'corto')}</div>
+                ${s.numero_transferencia ? `<div><strong>N° Transferencia:</strong> ${s.numero_transferencia}</div>` : ''}
+                ${s.fecha_pago ? `<div><strong>Fecha Pago:</strong> ${formatearFechaLocal(s.fecha_pago, 'corto')}</div>` : ''}
             </div>
-            <div class="detalles-info">
-                <div class="info-grid">
-                    <div><strong>Solicitante:</strong> ${s.solicitante_nombre}</div>
-                    <div><strong>Fecha:</strong> ${formatearFechaLocal(s.fecha_solicitud, 'corto')}</div>
-                    <div><strong>Proyecto:</strong> ${s.proyecto_nombre}</div>
-                    <div><strong>Monto:</strong> $${parseFloat(s.monto_solicitado).toFixed(2)}</div>
-                    <div><strong>Beneficiario:</strong> ${s.beneficiario}</div>
-                    <div><strong>Prioridad:</strong> ${s.prioridad || 'Media'}</div>
-                    <div><strong>Forma de Pago:</strong> ${s.forma_pago || 'Transferencia'}</div>
-                    <div><strong>Fecha Requerida:</strong> ${formatearFechaLocal(s.fecha_requerida, 'corto')}</div>
-                    ${s.numero_transferencia ? `<div><strong>N° Transferencia:</strong> ${s.numero_transferencia}</div>` : ''}
-                    ${s.fecha_pago ? `<div><strong>Fecha Pago:</strong> ${formatearFechaLocal(s.fecha_pago, 'corto')}</div>` : ''}
-                </div>
-                ${honorariosHtml}
-                ${detallesHtml}
-                ${historialHtml}
-            </div>
-        `;
+            ${opHtml}
+            ${honorariosHtml}
+            ${detallesHtml}
+            ${historialHtml}
+        </div>
+    `;
     }
 
     // ========== MODAL: APROBACIÓN ==========
@@ -1197,6 +1251,286 @@ const solicitudesPagosModales = (function () {
         });
     }
 
+    // ========== ORDEN DE PAGO (OP) ==========
+
+    async function mostrarOrdenPago(id) {
+        Swal.fire({
+            title: 'Cargando Orden de Pago...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            const response = await fetch(`./api/obtener_detalles_pago.php?id=${id}`);
+            const data = await response.json();
+            Swal.close();
+
+            if (data.success && data.solicitud.codigo_op) {
+                const s = data.solicitud;
+                const html = generarHTMLOrdenPago(s);
+
+                // ✅ Verificar que el elemento exista antes de asignar
+                const contentElement = document.getElementById('reporte-op-content');
+                if (contentElement) {
+                    contentElement.innerHTML = html;
+                } else {
+                    console.error('❌ Elemento reporte-op-content no encontrado');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo cargar el contenido de la Orden de Pago'
+                    });
+                    return;
+                }
+
+                // ✅ Abrir modal usando la instancia guardada
+                if (modalInstances['modal-reporte-op']) {
+                    modalInstances['modal-reporte-op'].show();
+                } else {
+                    // Fallback: usar bootstrap directamente
+                    const modalElement = document.getElementById('modal-reporte-op');
+                    if (modalElement) {
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se encontró el modal de Orden de Pago'
+                        });
+                    }
+                }
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sin Orden de Pago',
+                    text: 'Esta solicitud aún no tiene una Orden de Pago generada.'
+                });
+            }
+        } catch (error) {
+            Swal.close();
+            console.error('Error al cargar OP:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cargar la Orden de Pago: ' + error.message
+            });
+        }
+    }
+
+    function generarHTMLOrdenPago(s) {
+        const fechaAprobacion = formatearFechaLocal(s.fecha_aprobacion, 'largo');
+        const totalLetras = numeroALetras(s.monto_solicitado);
+        const detalles = s.detalles || [];
+
+        let detallesHtml = '';
+        if (detalles.length) {
+            let rows = '';
+            detalles.forEach(d => {
+                rows += `<tr>
+                <td style="border: 1px solid #dee2e6; padding: 5px;">${escapeHtml(d.descripcion)}</td>
+                <td style="border: 1px solid #dee2e6; padding: 5px; text-align: center;">${d.periodo || '-'}</td>
+                <td style="border: 1px solid #dee2e6; padding: 5px; text-align: right;">$ ${parseFloat(d.monto).toFixed(2)}</td>
+            </tr>`;
+            });
+            detallesHtml = `
+            <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #2c3e50; color: #ffffff;">
+                        <th style="border: 1px solid #dee2e6; padding: 5px; text-align: left;">Descripción</th>
+                        <th style="border: 1px solid #dee2e6; padding: 5px; text-align: center;">Período</th>
+                        <th style="border: 1px solid #dee2e6; padding: 5px; text-align: right;">Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows}
+                    <tr style="background-color: #f8f9fa; font-weight: bold;">
+                        <td colspan="2" style="border: 1px solid #dee2e6; padding: 5px; text-align: right;">TOTAL:</td>
+                        <td style="border: 1px solid #dee2e6; padding: 5px; text-align: right; color: #27ae60;">$ ${parseFloat(s.monto_solicitado).toFixed(2)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        }
+
+        const esHonorario = s.es_honorario ? 'Sí' : 'No';
+
+        return `
+        <div id="reporte-op-${s.id}" class="reporte-op" style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; line-height: 1.4;">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <h2 style="color: #2c3e50; margin: 0; font-size: 18px;">CODEHCIU</h2>
+                <p style="color: #7f8c8d; margin: 2px 0; font-size: 11px;">Comisión para los Derechos Humanos y la Ciudadanía</p>
+                <h3 style="color: #3498db; margin: 8px 0 0 0; font-size: 14px;">ORDEN DE PAGO</h3>
+            </div>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; background: #f8f9fa; padding: 10px; border-radius: 6px;">
+                <div style="flex: 1; min-width: 180px;">
+                    <p style="margin: 2px 0;"><strong>N° OP:</strong> ${s.codigo_op}</p>
+                    <p style="margin: 2px 0;"><strong>Fecha Emisión:</strong> ${fechaAprobacion}</p>
+                    <p style="margin: 2px 0;"><strong>Solicitud:</strong> ${s.codigo_solicitud}</p>
+                </div>
+                <div style="flex: 1; min-width: 180px;">
+                    <p style="margin: 2px 0;"><strong>Solicitante:</strong> ${escapeHtml(s.solicitante_nombre)}</p>
+                    <p style="margin: 2px 0;"><strong>Proyecto:</strong> ${escapeHtml(s.proyecto_nombre)}</p>
+                    <p style="margin: 2px 0;"><strong>Honorarios:</strong> ${esHonorario}</p>
+                </div>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #2c3e50; margin: 0 0 8px 0; font-size: 12px;">BENEFICIARIO</h4>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                    <div><strong>Nombre:</strong><br>${escapeHtml(s.beneficiario)}</div>
+                    <div><strong>RIF/CI:</strong><br>${s.documento_beneficiario || 'No especificado'}</div>
+                    <div><strong>Banco:</strong><br>${s.banco_beneficiario || 'No especificado'}</div>
+                    <div><strong>Cuenta:</strong><br>${s.cuenta_beneficiario || 'No especificada'}</div>
+                    <div><strong>Forma de Pago:</strong><br>${s.forma_pago || 'Transferencia'}</div>
+                </div>
+            </div>
+            
+            <h4 style="color: #2c3e50; margin: 10px 0 5px 0; font-size: 12px;">DETALLE DEL PAGO</h4>
+            ${detallesHtml}
+            
+            <div style="text-align: right; margin: 8px 0; padding: 5px; background: #f8f9fa; border-radius: 4px; font-size: 10px;">
+                <p style="margin: 0;"><strong>Total en letras:</strong> ${totalLetras}</p>
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #dee2e6;">
+                <p style="margin: 2px 0; text-align: center; font-size: 10px; color: #7f8c8d;">
+                    <strong>Concepto:</strong> ${escapeHtml(s.concepto)}
+                </p>
+                ${s.descripcion ? `<p style="margin: 2px 0; text-align: center; font-size: 10px; color: #7f8c8d;">${escapeHtml(s.descripcion)}</p>` : ''}
+                ${s.justificacion ? `<p style="margin: 2px 0; text-align: center; font-size: 10px; color: #7f8c8d;"><strong>Justificación:</strong> ${escapeHtml(s.justificacion)}</p>` : ''}
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 25px; padding-top: 10px; border-top: 1px solid #dee2e6;">
+                <div style="text-align: center; flex: 1;">
+                    <p style="margin: 0; font-size: 10px;">_________________________</p>
+                    <p style="margin: 2px 0; font-weight: bold; font-size: 10px;">Solicitante</p>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <p style="margin: 0; font-size: 10px;">_________________________</p>
+                    <p style="margin: 2px 0; font-weight: bold; font-size: 10px;">Resp. Finanzas</p>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <p style="margin: 0; font-size: 10px;">_________________________</p>
+                    <p style="margin: 2px 0; font-weight: bold; font-size: 10px;">Administración</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 12px; text-align: center; font-size: 8px; color: #95a5a6; border-top: 1px solid #dee2e6; padding-top: 5px;">
+                <p style="margin: 2px 0;">Documento generado por el Sistema de Finanzas CODEHCIU</p>
+                <p style="margin: 2px 0;">Fecha de emisión: ${new Date().toLocaleString()}</p>
+            </div>
+        </div>
+    `;
+    }
+
+    function numeroALetras(numero) {
+        const unidades = ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
+        const decenas = ['', 'diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
+        const centenas = ['', 'cien', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+
+        if (numero === 0) return 'cero';
+
+        let entero = Math.floor(numero);
+        let decimales = Math.round((numero - entero) * 100);
+        let partes = [];
+
+        if (entero >= 1000) {
+            let miles = Math.floor(entero / 1000);
+            partes.push(centenas[Math.floor(miles / 100)] || '');
+            if (miles % 100 !== 0) partes.push(decenas[Math.floor((miles % 100) / 10)] || '');
+            partes.push(unidades[miles % 10] || '');
+            partes.push('mil');
+            entero = entero % 1000;
+        }
+        if (entero >= 100) { partes.push(centenas[Math.floor(entero / 100)]); entero = entero % 100; }
+        if (entero >= 20) { partes.push(decenas[Math.floor(entero / 10)]); entero = entero % 10; }
+        if (entero >= 10) {
+            const especiales = { 10: 'diez', 11: 'once', 12: 'doce', 13: 'trece', 14: 'catorce', 15: 'quince', 16: 'dieciséis', 17: 'diecisiete', 18: 'dieciocho', 19: 'diecinueve' };
+            partes.push(especiales[entero]);
+            entero = 0;
+        }
+        if (entero > 0) partes.push(unidades[entero]);
+
+        let resultado = partes.filter(p => p).join(' ');
+        if (decimales > 0) resultado += ` con ${decimales}/100`;
+        return resultado.toUpperCase();
+    }
+
+    async function imprimirOrdenPago(id) {
+        try {
+            Swal.fire({
+                title: 'Preparando impresión...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            const response = await fetch(`./api/obtener_detalles_pago.php?id=${id}`);
+            const data = await response.json();
+            Swal.close();
+
+            if (data.success && data.solicitud.codigo_op) {
+                const html = generarHTMLOrdenPago(data.solicitud);
+                const ventana = window.open('', '_blank');
+
+                if (!ventana) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Bloqueador de ventanas',
+                        text: 'Por favor, permite las ventanas emergentes para imprimir.'
+                    });
+                    return;
+                }
+
+                ventana.document.write(`
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Orden de Pago ${data.solicitud.codigo_op}</title>
+                        <meta charset="UTF-8">
+                        <style>
+                            body { margin: 0; padding: 20px; font-family: 'Segoe UI', Arial, sans-serif; }
+                            table { width: 100%; border-collapse: collapse; }
+                            th, td { padding: 5px; border: 1px solid #ddd; text-align: left; }
+                            @media print {
+                                body { padding: 10px; }
+                                .no-print { display: none !important; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${html}
+                        <script>
+                            window.onload = function() {
+                                setTimeout(function() {
+                                    window.print();
+                                    setTimeout(function() { window.close(); }, 500);
+                                }, 300);
+                            };
+                        <\/script>
+                    </body>
+                </html>
+            `);
+                ventana.document.close();
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sin Orden de Pago',
+                    text: 'Esta solicitud aún no tiene una Orden de Pago generada.'
+                });
+            }
+        } catch (error) {
+            Swal.close();
+            console.error('Error al imprimir OP:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al imprimir la Orden de Pago: ' + error.message
+            });
+        }
+    }
+
     // ========== API PÚBLICA ==========
     return {
         inicializarModales,
@@ -1215,7 +1549,11 @@ const solicitudesPagosModales = (function () {
         escapeHtml,
         cargarUsuariosPago,
         cargarDatosPagoUsuario,
-        toggleTipoBeneficiario
+        toggleTipoBeneficiario,
+        mostrarOrdenPago,
+        imprimirOrdenPago,
+        generarHTMLOrdenPago,
+        numeroALetras
     };
 })();
 

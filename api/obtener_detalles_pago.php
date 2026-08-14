@@ -1,7 +1,7 @@
 <?php
 /**
  * API para Obtener Detalles de Solicitud de Pago
- * CODEHCIU - Sistema de Finanzas
+ * Incluye Orden de Pago (OP) si existe
  */
 
 header('Content-Type: application/json');

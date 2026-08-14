@@ -513,6 +513,30 @@
     </div>
 </div>
 
+    <!-- MODAL: Reporte Orden de Pago -->
+    <div class="modal fade" id="modal-reporte-op" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-file-invoice"></i> Orden de Pago</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="reporte-op-content">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-2">Cargando Orden de Pago...</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cerrar</button>
+                    <button class="btn btn-primary" id="btn-imprimir-op"><i class="fas fa-print"></i> Imprimir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: Ver Comprobante de Pago -->
     <div class="modal fade" id="modal-ver-comprobante-pago" tabindex="-1">
         <div class="modal-dialog modal-md">
