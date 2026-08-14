@@ -68,7 +68,7 @@ const solicitudesPagosModales = (function () {
 
         // Evento para checkbox de honorarios
         document.getElementById('solicitud-es-honorario-pago')?.addEventListener('change', toggleTipoBeneficiario);
-        
+
         // Evento para select de usuarios
         document.getElementById('solicitud-beneficiario-pago')?.addEventListener('change', cargarDatosPagoUsuario);
 
@@ -91,7 +91,7 @@ const solicitudesPagosModales = (function () {
                     container.style.display = 'block';
                     document.getElementById('cerrar-tasa-cambio-pago').required = true;
                 } else {
-                    container.style.display = 'block'; // Siempre visible pero no requerido
+                    container.style.display = 'block';
                     document.getElementById('cerrar-tasa-cambio-pago').required = false;
                     document.getElementById('cerrar-tasa-cambio-pago').value = '';
                 }
@@ -205,24 +205,24 @@ const solicitudesPagosModales = (function () {
     async function cargarUsuariosPago(proyectoId, soloTerceros = false) {
         const select = document.getElementById('solicitud-beneficiario-pago');
         if (!select) return;
-        
+
         select.innerHTML = '<option value="">Cargando usuarios...</option>';
         select.disabled = true;
-        
+
         try {
             let url = './api/obtener_usuarios_pago.php?proyecto_id=' + proyectoId;
             if (soloTerceros) url += '&solo_terceros=true';
-            
+
             const response = await fetch(url);
             const data = await response.json();
-            
+
             select.innerHTML = '<option value="">Seleccionar beneficiario...</option>';
-            
+
             if (data.success && data.usuarios && data.usuarios.length > 0) {
                 data.usuarios.forEach(user => {
                     const option = document.createElement('option');
                     option.value = user.id;
-                    
+
                     let label = user.nombre;
                     if (user.cargo) label += ` (${user.cargo})`;
                     if (user.datos_pago && user.datos_pago.es_tercero) {
@@ -231,10 +231,9 @@ const solicitudesPagosModales = (function () {
                     if (user.datos_pago && user.datos_pago.monto_honorarios) {
                         label += ` - $${user.datos_pago.monto_honorarios.toFixed(2)}`;
                     }
-                    
+
                     option.textContent = label;
-                    
-                    // Guardar datos de pago como data attributes
+
                     if (user.datos_pago) {
                         option.dataset.banco = user.datos_pago.banco || '';
                         option.dataset.tipoCuenta = user.datos_pago.tipo_cuenta || '';
@@ -245,7 +244,7 @@ const solicitudesPagosModales = (function () {
                         option.dataset.esTercero = user.datos_pago.es_tercero ? 'true' : 'false';
                         option.dataset.tipoContrato = user.datos_pago.tipo_contrato || '';
                     }
-                    
+
                     select.appendChild(option);
                 });
             } else {
@@ -260,12 +259,12 @@ const solicitudesPagosModales = (function () {
     }
 
     /**
-     * Carga los datos bancarios del usuario seleccionado y los detalles automáticos
-     */
+ * Carga los datos bancarios del usuario seleccionado y los detalles automáticos
+ */
     function cargarDatosPagoUsuario() {
         const select = document.getElementById('solicitud-beneficiario-pago');
         const selectedOption = select.options[select.selectedIndex];
-        
+
         const bancoInput = document.getElementById('solicitud-banco-pago');
         const cuentaInput = document.getElementById('solicitud-cuenta-pago');
         const documentoInput = document.getElementById('solicitud-documento-pago');
@@ -275,7 +274,7 @@ const solicitudesPagosModales = (function () {
         const infoDiv = document.getElementById('info-datos-pago');
         const conceptoInput = document.getElementById('solicitud-concepto-pago');
         const detallesContainer = document.getElementById('detalles-container-pago');
-        
+
         if (!selectedOption || !selectedOption.value) {
             // Limpiar campos
             if (bancoInput) bancoInput.value = '';
@@ -285,16 +284,21 @@ const solicitudesPagosModales = (function () {
             if (montoInput) montoInput.value = '';
             if (tipoContratoInput) tipoContratoInput.value = '';
             if (infoDiv) infoDiv.textContent = 'Seleccione un usuario para ver sus datos de pago';
-            // Limpiar detalles
-            if (detallesContainer) detallesContainer.innerHTML = '';
-            document.getElementById('total-monto-pago').textContent = '$0.00';
-            document.getElementById('solicitud-monto-total-pago').value = '0';
+
+            // Limpiar detalles de honorarios y dejar solo uno vacío
+            if (detallesContainer) {
+                // Eliminar todos los detalles
+                detallesContainer.innerHTML = '';
+                // Agregar un detalle vacío
+                agregarDetalle();
+            }
+
+            calcularTotalPago();
             return;
         }
-        
+
         // Cargar datos del option
         const banco = selectedOption.dataset.banco || '';
-        const tipoCuenta = selectedOption.dataset.tipoCuenta || '';
         const numeroCuenta = selectedOption.dataset.numeroCuenta || '';
         const numeroCedula = selectedOption.dataset.numeroCedula || '';
         const formaPago = selectedOption.dataset.formaPago || 'Transferencia';
@@ -302,92 +306,92 @@ const solicitudesPagosModales = (function () {
         const esTercero = selectedOption.dataset.esTercero === 'true';
         const tipoContrato = selectedOption.dataset.tipoContrato || '';
         const nombreUsuario = selectedOption.text.split(' (')[0];
-        const cargoUsuario = selectedOption.text.includes('(') ? selectedOption.text.split('(')[1]?.replace(')', '') || '' : '';
-        
+
         // Llenar campos bancarios
         if (bancoInput) bancoInput.value = banco;
         if (cuentaInput) cuentaInput.value = numeroCuenta;
         if (documentoInput) documentoInput.value = numeroCedula;
         if (formaPagoInput) formaPagoInput.value = formaPago;
-        
-        // Campos de honorarios
+
         const honorariosGroup = document.getElementById('honorarios-group');
-        
+
         if (esTercero && montoHonorarios > 0) {
             if (honorariosGroup) honorariosGroup.style.display = 'block';
             if (montoInput) montoInput.value = montoHonorarios;
             if (tipoContratoInput) tipoContratoInput.value = tipoContrato || 'Honorarios';
             if (infoDiv) {
                 infoDiv.innerHTML = `
-                    <strong>${nombreUsuario}</strong><br>
-                    <small>Banco: ${banco} | Cuenta: ${numeroCuenta}</small><br>
-                    <small>Honorarios: $${montoHonorarios.toFixed(2)}</small>
-                `;
+                <strong>${nombreUsuario}</strong><br>
+                <small>Banco: ${banco} | Cuenta: ${numeroCuenta}</small><br>
+                <small>Honorarios: $${montoHonorarios.toFixed(2)}</small>
+            `;
             }
-            
-            // ✅ NUEVO: Actualizar concepto automáticamente
+
             if (conceptoInput && !conceptoInput.value) {
-                conceptoInput.value = `Honorarios profesionales - ${nombreUsuario}`;
+                conceptoInput.value = `HONORARIOS - ${nombreUsuario}`;
             }
-            
-            // ✅ NUEVO: Cargar detalles automáticos (solo si no hay detalles)
-            if (detallesContainer && detallesContainer.children.length === 0) {
-                // Crear el detalle automático
+
+            // ✅ ELIMINAR TODOS LOS DETALLES EXISTENTES
+            if (detallesContainer) {
+                detallesContainer.innerHTML = '';
+            }
+
+            // ✅ CREAR UN SOLO DETALLE CON HONORARIOS
+            if (detallesContainer) {
                 const mesActual = new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' });
                 const mesCapitalizado = mesActual.charAt(0).toUpperCase() + mesActual.slice(1);
-                
+
                 const html = `
-                    <div class="detalle-row">
-                        <div class="row g-2">
-                            <div class="col-md-5">
-                                <input type="text" class="form-control form-control-sm detalle-descripcion" 
-                                    value="Honorarios profesionales - ${nombreUsuario}" required>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text">$</span>
-                                    <input type="number" class="form-control detalle-monto" 
-                                        value="${montoHonorarios.toFixed(2)}" step="0.01" 
-                                        onchange="solicitudesPagosModales.calcularTotalPago()">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <input type="text" class="form-control form-control-sm detalle-periodo" 
-                                    value="${mesCapitalizado}">
-                            </div>
-                            <div class="col-md-1">
-                                <button type="button" class="btn btn-sm btn-danger" 
-                                        onclick="solicitudesPagosModales.eliminarDetalle(this)">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                <div class="detalle-row">
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control form-control-sm detalle-descripcion" 
+                                   value="HONORARIOS - ${nombreUsuario}" required>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control detalle-monto" 
+                                       value="${montoHonorarios.toFixed(2)}" step="0.01" 
+                                       onchange="solicitudesPagosModales.calcularTotalPago()">
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm detalle-periodo" 
+                                   value="${mesCapitalizado}">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-sm btn-danger" 
+                                    onclick="solicitudesPagosModales.eliminarDetalle(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                     </div>
-                `;
+                </div>
+            `;
                 detallesContainer.insertAdjacentHTML('beforeend', html);
             }
-            
-            // ✅ NUEVO: Si ya hay detalles, actualizar el monto del primer detalle
-            if (detallesContainer && detallesContainer.children.length > 0) {
-                const primerDetalle = detallesContainer.querySelector('.detalle-row:first-child .detalle-monto');
-                if (primerDetalle) {
-                    primerDetalle.value = montoHonorarios.toFixed(2);
-                }
-            }
-            
-            // Actualizar el total
+
             calcularTotalPago();
-            
+
         } else {
             if (honorariosGroup) honorariosGroup.style.display = 'none';
             if (montoInput) montoInput.value = '';
             if (tipoContratoInput) tipoContratoInput.value = '';
             if (infoDiv) {
                 infoDiv.innerHTML = `
-                    <strong>${nombreUsuario}</strong><br>
-                    <small>Banco: ${banco} | Cuenta: ${numeroCuenta}</small>
-                `;
+                <strong>${nombreUsuario}</strong><br>
+                <small>Banco: ${banco} | Cuenta: ${numeroCuenta}</small>
+            `;
             }
+
+            // ✅ Si no es tercero, limpiar detalles y dejar uno vacío
+            if (detallesContainer) {
+                detallesContainer.innerHTML = '';
+                agregarDetalle();
+            }
+
+            calcularTotalPago();
         }
     }
 
@@ -403,30 +407,42 @@ const solicitudesPagosModales = (function () {
         const beneficiarioManual = document.getElementById('solicitud-beneficiario-manual-pago');
         const detalleNota = document.getElementById('detalle-honorario-nota');
         const detallesContainer = document.getElementById('detalles-container-pago');
-        
+        const select = document.getElementById('solicitud-beneficiario-pago');
+
         if (esHonorario) {
             if (grupoManual) grupoManual.style.display = 'none';
             if (grupoUsuarios) grupoUsuarios.style.display = 'block';
             if (honorariosGroup) honorariosGroup.style.display = 'block';
             if (detalleNota) detalleNota.style.display = 'block';
-            
+
             if (conceptoInput && !conceptoInput.value) {
-                conceptoInput.placeholder = 'Ej: Honorarios profesionales, Consultoría...';
+                conceptoInput.placeholder = 'Ej: HONORARIOS - Nombre del consultor...';
             }
             if (beneficiarioManual) beneficiarioManual.required = false;
-            
-            // Cargar usuarios (solo terceros)
+
+            // ✅ ELIMINAR EL DETALLE VACÍO POR DEFECTO
+            if (detallesContainer) {
+                const detalles = detallesContainer.querySelectorAll('.detalle-row');
+                detalles.forEach(row => {
+                    const desc = row.querySelector('.detalle-descripcion');
+                    const monto = row.querySelector('.detalle-monto');
+                    // Eliminar si está vacío (sin descripción o sin monto)
+                    if ((!desc || !desc.value || desc.value.trim() === '') &&
+                        (!monto || !monto.value || parseFloat(monto.value) === 0)) {
+                        row.remove();
+                    }
+                });
+            }
+
             const proyectoId = document.getElementById('solicitud-proyecto-pago').value;
             if (proyectoId) {
                 cargarUsuariosPago(proyectoId, true);
             }
-            
-            // ✅ NUEVO: Si ya hay un usuario seleccionado, cargar sus datos
-            const select = document.getElementById('solicitud-beneficiario-pago');
+
             if (select && select.value) {
                 cargarDatosPagoUsuario();
             }
-            
+
         } else {
             if (grupoManual) grupoManual.style.display = 'block';
             if (grupoUsuarios) grupoUsuarios.style.display = 'none';
@@ -434,14 +450,12 @@ const solicitudesPagosModales = (function () {
             if (detalleNota) detalleNota.style.display = 'none';
             if (conceptoInput) {
                 conceptoInput.placeholder = 'Ej: Pago de servicio de luz, Internet...';
-                if (conceptoInput.value && conceptoInput.value.includes('Honorarios')) {
+                if (conceptoInput.value && conceptoInput.value.toUpperCase().includes('HONORARIOS')) {
                     conceptoInput.value = '';
                 }
             }
             if (beneficiarioManual) beneficiarioManual.required = true;
-            
-            // Limpiar campos de usuarios
-            const select = document.getElementById('solicitud-beneficiario-pago');
+
             if (select) {
                 select.innerHTML = '<option value="">Seleccionar usuario...</option>';
             }
@@ -452,20 +466,15 @@ const solicitudesPagosModales = (function () {
             document.getElementById('solicitud-monto-honorarios-pago').value = '';
             document.getElementById('solicitud-tipo-contrato-pago').value = '';
             document.getElementById('info-datos-pago').textContent = 'Seleccione un usuario para ver sus datos de pago';
-            
-            // ✅ NUEVO: Limpiar detalles automáticos si existen
+
+            // ✅ ELIMINAR DETALLES DE HONORARIOS Y DEJAR SOLO UN DETALLE VACÍO
             if (detallesContainer) {
-                // Solo limpiar si los detalles son automáticos (tienen "Honorarios profesionales" en la descripción)
-                const detalles = detallesContainer.querySelectorAll('.detalle-row');
-                detalles.forEach(row => {
-                    const desc = row.querySelector('.detalle-descripcion');
-                    if (desc && desc.value.includes('Honorarios profesionales')) {
-                        row.remove();
-                    }
-                });
+                // Eliminar todos los detalles existentes
+                detallesContainer.innerHTML = '';
+                // Agregar un detalle vacío
+                agregarDetalle();
             }
-            
-            // Recalcular total
+
             calcularTotalPago();
         }
     }
@@ -476,8 +485,7 @@ const solicitudesPagosModales = (function () {
         const detallesContainer = document.getElementById('detalles-container-pago');
         if (detallesContainer) detallesContainer.innerHTML = '';
         document.getElementById('total-monto-pago').textContent = '$0.00';
-        
-        // Resetear campos de honorarios
+
         document.getElementById('solicitud-es-honorario-pago').checked = false;
         document.getElementById('beneficiario-manual-group').style.display = 'block';
         document.getElementById('beneficiario-usuarios-group').style.display = 'none';
@@ -486,26 +494,32 @@ const solicitudesPagosModales = (function () {
         document.getElementById('solicitud-beneficiario-pago').innerHTML = '<option value="">Seleccionar...</option>';
         document.getElementById('solicitud-beneficiario-manual-pago').required = true;
         document.getElementById('solicitud-concepto-pago').placeholder = 'Ej: Pago de servicio de luz, Internet...';
-        
-        // ✅ NUEVO: Limpiar el concepto si tiene contenido de honorarios
+
         const conceptoInput = document.getElementById('solicitud-concepto-pago');
-        if (conceptoInput && conceptoInput.value.includes('Honorarios')) {
+        if (conceptoInput && conceptoInput.value && conceptoInput.value.toUpperCase().includes('HONORARIOS')) {
             conceptoInput.value = '';
         }
-        
-        generarCodigoPreview(proyectoId);
-        cargarProyectos(proyectoId);
-        agregarDetalle();
-        
-        // ✅ NUEVO: Configurar evento del select de usuarios
+
+        const checkHonorario = document.getElementById('solicitud-es-honorario-pago');
+        if (checkHonorario) {
+            const newCheck = checkHonorario.cloneNode(true);
+            checkHonorario.parentNode.replaceChild(newCheck, checkHonorario);
+            newCheck.addEventListener('change', toggleTipoBeneficiario);
+        }
+
         const selectUsuario = document.getElementById('solicitud-beneficiario-pago');
         if (selectUsuario) {
-            // Remover eventos anteriores
             const newSelect = selectUsuario.cloneNode(true);
             selectUsuario.parentNode.replaceChild(newSelect, selectUsuario);
             newSelect.addEventListener('change', cargarDatosPagoUsuario);
         }
-        
+
+        generarCodigoPreview(proyectoId);
+        cargarProyectos(proyectoId);
+
+        // ✅ AGREGAR UN DETALLE VACÍO POR DEFECTO (SOLO PARA MODO NORMAL)
+        agregarDetalle();
+
         modalInstances['modal-nueva-solicitud-pago']?.show();
     }
 
@@ -546,7 +560,6 @@ const solicitudesPagosModales = (function () {
                 if (seleccionarId) cargarPartidas(seleccionarId);
                 select.addEventListener('change', () => {
                     cargarPartidas(select.value);
-                    // Si está en modo honorarios, recargar usuarios
                     if (document.getElementById('solicitud-es-honorario-pago').checked) {
                         cargarUsuariosPago(select.value, true);
                     }
@@ -619,102 +632,200 @@ const solicitudesPagosModales = (function () {
     function calcularTotalPago() {
         let total = 0;
         const esHonorario = document.getElementById('solicitud-es-honorario-pago').checked;
-        
+
         if (esHonorario) {
-            // Si es honorario, tomar el monto del usuario seleccionado
             const select = document.getElementById('solicitud-beneficiario-pago');
             const selectedOption = select.options[select.selectedIndex];
             if (selectedOption && selectedOption.dataset.montoHonorarios) {
                 total = parseFloat(selectedOption.dataset.montoHonorarios) || 0;
             }
         } else {
-            // Sumar los detalles
             document.querySelectorAll('.detalle-row').forEach(row => {
                 const monto = parseFloat(row.querySelector('.detalle-monto')?.value) || 0;
                 total += monto;
             });
         }
-        
+
         document.getElementById('total-monto-pago').textContent = `$${total.toFixed(2)}`;
         document.getElementById('solicitud-monto-total-pago').value = total;
     }
 
-    // ========== GUARDAR SOLICITUD ==========
-async function guardarSolicitud() {
-    const form = document.getElementById('form-nueva-solicitud-pago');
-    if (!form.checkValidity()) return form.reportValidity();
-
-    const esHonorario = document.getElementById('solicitud-es-honorario-pago').checked;
-    let beneficiario = '';
-    let documento_beneficiario = '';
-    let cuenta_beneficiario = '';
-    let banco_beneficiario = '';
-    let forma_pago = document.getElementById('solicitud-forma-pago-pago').value || 'Transferencia';
-    let monto_honorarios = null;
-    let tipo_contrato = null;
-    let usuario_beneficiario_id = null;
-
-    if (esHonorario) {
-        const select = document.getElementById('solicitud-beneficiario-pago');
-        const selectedOption = select.options[select.selectedIndex];
-        
-        if (!selectedOption || !selectedOption.value) {
-            return Swal.fire({ icon: 'warning', title: 'Seleccione un beneficiario' });
+    // ========== GUARDAR SOLICITUD - OPTIMIZADO ==========
+    async function guardarSolicitud() {
+        const form = document.getElementById('form-nueva-solicitud-pago');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
         }
-        
-        usuario_beneficiario_id = selectedOption.value;
-        beneficiario = selectedOption.text.split(' (')[0];
-        documento_beneficiario = selectedOption.dataset.numeroCedula || '';
-        cuenta_beneficiario = selectedOption.dataset.numeroCuenta || '';
-        banco_beneficiario = selectedOption.dataset.banco || '';
-        forma_pago = selectedOption.dataset.formaPago || 'Transferencia';
-        monto_honorarios = parseFloat(selectedOption.dataset.montoHonorarios) || 0;
-        tipo_contrato = document.getElementById('solicitud-tipo-contrato-pago').value || 'Honorarios';
-    } else {
-        beneficiario = document.getElementById('solicitud-beneficiario-manual-pago').value;
-        documento_beneficiario = document.getElementById('solicitud-documento-pago').value;
-        cuenta_beneficiario = document.getElementById('solicitud-cuenta-pago').value;
-        banco_beneficiario = document.getElementById('solicitud-banco-pago').value;
-        forma_pago = document.getElementById('solicitud-forma-pago-pago').value || 'Transferencia';
-    }
 
-    const detalles = [];
-    document.querySelectorAll('.detalle-row').forEach(row => {
-        const desc = row.querySelector('.detalle-descripcion')?.value;
-        const monto = row.querySelector('.detalle-monto')?.value;
-        const periodo = row.querySelector('.detalle-periodo')?.value;
-        if (desc && monto) {
-            detalles.push({
-                descripcion: desc,
-                monto: parseFloat(monto),
-                periodo: periodo || null
+        const esHonorario = document.getElementById('solicitud-es-honorario-pago').checked;
+        let beneficiario = '';
+        let documento_beneficiario = '';
+        let cuenta_beneficiario = '';
+        let banco_beneficiario = '';
+        let forma_pago = document.getElementById('solicitud-forma-pago-pago').value || 'Transferencia';
+        let monto_honorarios = null;
+        let tipo_contrato = null;
+        let usuario_beneficiario_id = null;
+
+        if (esHonorario) {
+            const select = document.getElementById('solicitud-beneficiario-pago');
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (!selectedOption || !selectedOption.value) {
+                Swal.fire({ icon: 'warning', title: 'Seleccione un beneficiario' });
+                return;
+            }
+
+            usuario_beneficiario_id = selectedOption.value;
+            beneficiario = selectedOption.text.split(' (')[0];
+            documento_beneficiario = selectedOption.dataset.numeroCedula || '';
+            cuenta_beneficiario = selectedOption.dataset.numeroCuenta || '';
+            banco_beneficiario = selectedOption.dataset.banco || '';
+            forma_pago = selectedOption.dataset.formaPago || 'Transferencia';
+            monto_honorarios = parseFloat(selectedOption.dataset.montoHonorarios) || 0;
+            tipo_contrato = document.getElementById('solicitud-tipo-contrato-pago').value || 'Honorarios';
+        } else {
+            beneficiario = document.getElementById('solicitud-beneficiario-manual-pago').value;
+            documento_beneficiario = document.getElementById('solicitud-documento-pago').value;
+            cuenta_beneficiario = document.getElementById('solicitud-cuenta-pago').value;
+            banco_beneficiario = document.getElementById('solicitud-banco-pago').value;
+            forma_pago = document.getElementById('solicitud-forma-pago-pago').value || 'Transferencia';
+        }
+
+        if (!beneficiario) {
+            Swal.fire({ icon: 'warning', title: 'Beneficiario requerido' });
+            return;
+        }
+
+        // ✅ RECORRER DETALLES DEL DOM - SOLO LOS VÁLIDOS
+        const detalles = [];
+        document.querySelectorAll('.detalle-row').forEach(row => {
+            const desc = row.querySelector('.detalle-descripcion')?.value;
+            const monto = row.querySelector('.detalle-monto')?.value;
+            const periodo = row.querySelector('.detalle-periodo')?.value;
+
+            if (desc && desc.trim() !== '' && monto && parseFloat(monto) > 0) {
+                detalles.push({
+                    descripcion: desc.trim(),
+                    monto: parseFloat(monto),
+                    periodo: periodo || null
+                });
+            }
+        });
+
+        if (detalles.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Detalles requeridos',
+                text: 'Agregue al menos un detalle del pago con descripción y monto válido.'
+            });
+            return;
+        }
+
+        let totalSolicitado = 0;
+        detalles.forEach(d => totalSolicitado += d.monto);
+
+        if (totalSolicitado <= 0) {
+            Swal.fire({ icon: 'warning', title: 'Monto inválido', text: 'El monto total debe ser mayor a 0' });
+            return;
+        }
+
+        // ✅ CONSTRUIR DATA - SOLO CAMPOS NECESARIOS
+        const data = {
+            proyecto_id: document.getElementById('solicitud-proyecto-pago').value,
+            partida_id: document.getElementById('solicitud-partida-pago').value || null,
+            concepto: document.getElementById('solicitud-concepto-pago').value,
+            descripcion: document.getElementById('solicitud-descripcion-pago').value || '',
+            monto_solicitado: totalSolicitado,
+            moneda: 'USD',
+            beneficiario: beneficiario,
+            documento_beneficiario: documento_beneficiario,
+            cuenta_beneficiario: cuenta_beneficiario,
+            banco_beneficiario: banco_beneficiario,
+            forma_pago: forma_pago,
+            fecha_requerida: document.getElementById('solicitud-fecha-requerida-pago').value,
+            prioridad: document.getElementById('solicitud-prioridad-pago').value || 'Media',
+            justificacion: document.getElementById('solicitud-justificacion-pago').value || '',
+            detalles: detalles,
+            es_honorario: esHonorario ? 1 : 0,
+            usuario_beneficiario_id: usuario_beneficiario_id,
+            monto_honorarios: monto_honorarios,
+            tipo_contrato: tipo_contrato
+        };
+
+        if (!data.proyecto_id) {
+            Swal.fire({ icon: 'warning', title: 'Proyecto requerido' });
+            return;
+        }
+
+        if (!data.concepto) {
+            Swal.fire({ icon: 'warning', title: 'Concepto requerido' });
+            return;
+        }
+
+        // ✅ SPINNER ÚNICO - SIN DUPLICADOS
+        const loadingSwal = Swal.fire({
+            title: 'Guardando solicitud...',
+            text: 'Por favor, espere un momento',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
+
+            const res = await fetch('./api/solicitudes_pagos.php?action=crear', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            const result = await res.json();
+
+            await loadingSwal.close();
+
+            if (result.success) {
+                modalInstances['modal-nueva-solicitud-pago']?.hide();
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Solicitud creada!',
+                    text: `La solicitud ${result.codigo || ''} se ha creado exitosamente.`,
+                    timer: 2500,
+                    showConfirmButton: false,
+                    timerProgressBar: true
+                });
+                if (window.solicitudesPagos) {
+                    window.solicitudesPagos.cargarSolicitudes();
+                }
+            } else {
+                throw new Error(result.message || 'Error al guardar la solicitud');
+            }
+        } catch (error) {
+            await loadingSwal.close();
+            console.error('Error al guardar:', error);
+
+            let mensaje = error.message;
+            if (error.name === 'AbortError') {
+                mensaje = 'La solicitud ha tardado demasiado. Por favor, intente nuevamente.';
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al guardar',
+                text: mensaje,
+                confirmButtonText: 'Entendido'
             });
         }
-    });
-
-    // ✅ MODIFICADO: Para honorarios, los detalles son opcionales pero si hay, se usan
-    // Si es honorario y no hay detalles, se crea automáticamente uno
-    if (esHonorario && detalles.length === 0 && monto_honorarios > 0) {
-        detalles.push({
-            descripcion: `Honorarios profesionales - ${beneficiario}`,
-            monto: monto_honorarios,
-            periodo: new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' })
-        });
     }
 
-    // Solo validar detalles si no es honorario
-    if (!esHonorario && !detalles.length) {
-        return Swal.fire({ icon: 'warning', title: 'Detalles requeridos', text: 'Agregue al menos un detalle del pago' });
-    }
-
-    let totalSolicitado = 0;
-    if (esHonorario && monto_honorarios > 0) {
-        // Si es honorario, el total es el monto de honorarios
-        totalSolicitado = monto_honorarios;
-    } else {
-        detalles.forEach(d => totalSolicitado += d.monto);
-    }
-}
     // ========== MODAL: VER DETALLES ==========
     async function verDetalles(id) {
         Swal.fire({ title: 'Cargando detalles...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -1034,14 +1145,11 @@ async function guardarSolicitud() {
         const id = document.getElementById('cerrar-solicitud-id-pago').value;
         const concepto = document.getElementById('cerrar-concepto-pago').value;
         const observaciones = document.getElementById('cerrar-observaciones-pago').value;
-
-        // ✅ OBTENER MONEDA Y TASA DE CAMBIO
         const moneda = document.getElementById('cerrar-moneda-pago')?.value || 'USD';
         const tasaCambio = parseFloat(document.getElementById('cerrar-tasa-cambio-pago')?.value) || 1.0000;
 
         if (!concepto) return Swal.fire({ icon: 'warning', title: 'Concepto requerido' });
 
-        // ✅ VALIDAR TASA DE CAMBIO SI ES BOLÍVARES
         if (moneda === 'BS' && tasaCambio <= 0) {
             return Swal.fire({
                 icon: 'warning',
@@ -1053,11 +1161,11 @@ async function guardarSolicitud() {
         Swal.fire({
             title: 'Cerrar solicitud de pago',
             html: `
-            <p>¿Está seguro de cerrar esta solicitud?</p>
-            <p><strong>Concepto:</strong> ${concepto}</p>
-            <p><strong>Moneda:</strong> ${moneda}</p>
-            ${moneda === 'BS' ? `<p><strong>Tasa de Cambio:</strong> ${tasaCambio.toFixed(4)} Bs/USD</p>` : ''}
-        `,
+                <p>¿Está seguro de cerrar esta solicitud?</p>
+                <p><strong>Concepto:</strong> ${concepto}</p>
+                <p><strong>Moneda:</strong> ${moneda}</p>
+                ${moneda === 'BS' ? `<p><strong>Tasa de Cambio:</strong> ${tasaCambio.toFixed(4)} Bs/USD</p>` : ''}
+            `,
             icon: 'question',
             showCancelButton: true
         }).then(async (result) => {

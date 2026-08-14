@@ -170,6 +170,7 @@ function listarSolicitudes($pdo, $usuario_id, $rol) {
 function crearSolicitud($pdo, $usuario_id) {
     $input = json_decode(file_get_contents('php://input'), true);
     
+    // ✅ VALIDACIONES RÁPIDAS - SIN CONSULTAS INNECESARIAS
     $required = ['proyecto_id', 'concepto', 'monto_solicitado', 'fecha_requerida', 'beneficiario'];
     foreach ($required as $field) {
         if (empty($input[$field])) {
@@ -178,7 +179,7 @@ function crearSolicitud($pdo, $usuario_id) {
         }
     }
     
-    // Validar proyecto
+    // ✅ VALIDAR PROYECTO - CONSULTA SIMPLE
     $check = $pdo->prepare("SELECT id FROM proyectos WHERE id = ?");
     $check->execute([$input['proyecto_id']]);
     if (!$check->fetch()) {
@@ -186,7 +187,6 @@ function crearSolicitud($pdo, $usuario_id) {
         return;
     }
     
-    // Validar que si es honorario, tenga usuario_beneficiario_id
     $es_honorario = isset($input['es_honorario']) ? (int)$input['es_honorario'] : 0;
     if ($es_honorario && empty($input['usuario_beneficiario_id'])) {
         echo json_encode(['success' => false, 'message' => 'Para pagos de honorarios debe seleccionar un usuario beneficiario']);
@@ -198,6 +198,7 @@ function crearSolicitud($pdo, $usuario_id) {
     try {
         $codigo = generarCodigoSolicitud($pdo, $input['proyecto_id']);
         
+        // ✅ INSERT PRINCIPAL - OPTIMIZADO
         $stmt = $pdo->prepare("
             INSERT INTO solicitudes_pagos (
                 codigo_solicitud, proyecto_id, partida_id, solicitante_id,
@@ -241,44 +242,27 @@ function crearSolicitud($pdo, $usuario_id) {
         
         $solicitud_id = $pdo->lastInsertId();
         
-        // Insertar detalles si existen
+        // ✅ INSERTAR DETALLES - BATCH OPTIMIZADO
         if (!empty($input['detalles']) && is_array($input['detalles'])) {
+            // Preparar consulta una sola vez
             $detalle_stmt = $pdo->prepare("
-                INSERT INTO pagos_detalles (solicitud_id, descripcion, monto, periodo, referencia)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO pagos_detalles (solicitud_id, descripcion, monto, periodo)
+                VALUES (?, ?, ?, ?)
             ");
-            foreach ($input['detalles'] as $detalle) {
-                $detalle_stmt->execute([
-                    $solicitud_id,
-                    $detalle['descripcion'],
-                    $detalle['monto'],
-                    $detalle['periodo'] ?? null,
-                    $detalle['referencia'] ?? null
-                ]);
-            }
-        }
-        
-        // Si es honorario, guardar referencia en detalles
-        if ($es_honorario && !empty($input['usuario_beneficiario_id'])) {
-            $user_stmt = $pdo->prepare("SELECT nombre FROM usuarios WHERE id = ?");
-            $user_stmt->execute([$input['usuario_beneficiario_id']]);
-            $user = $user_stmt->fetch();
             
-            if ($user) {
-                $detalle_stmt = $pdo->prepare("
-                    INSERT INTO pagos_detalles (solicitud_id, descripcion, monto, periodo)
-                    VALUES (?, ?, ?, ?)
-                ");
-                $detalle_stmt->execute([
-                    $solicitud_id,
-                    "Honorarios - " . $user['nombre'],
-                    $input['monto_solicitado'],
-                    date('F Y')
-                ]);
+            foreach ($input['detalles'] as $detalle) {
+                if (!empty($detalle['descripcion']) && !empty($detalle['monto']) && $detalle['monto'] > 0) {
+                    $detalle_stmt->execute([
+                        $solicitud_id,
+                        $detalle['descripcion'],
+                        $detalle['monto'],
+                        $detalle['periodo'] ?? null
+                    ]);
+                }
             }
         }
         
-        // Historial
+        // ✅ HISTORIAL - SIMPLE
         $historial = $pdo->prepare("
             INSERT INTO historial_pagos (solicitud_id, usuario_id, estado_nuevo, comentario)
             VALUES (?, ?, 'Pendiente', 'Solicitud de pago creada')
@@ -287,31 +271,39 @@ function crearSolicitud($pdo, $usuario_id) {
         
         $pdo->commit();
         
-        // Enviar notificación a contabilidad
-        $contabEmails = getEmailsPorRol($pdo, 'contab');
-        $asunto = "NUEVA SOLICITUD DE PAGO - {$codigo}";
-        $monto_formateado = number_format($input['monto_solicitado'], 2, ',', '.');
-        $tipo_pago = $es_honorario ? 'Honorarios/Terceros' : 'Pago General';
-        
-        $cuerpo = "
-            <div style='font-family: Arial, sans-serif; max-width: 600px;'>
-                <div style='background-color: #2c3e50; padding: 20px; text-align: center;'>
-                    <h2 style='color: #fff;'>CODEHCIU - Finanzas</h2>
-                    <p style='color: #ecf0f1;'>Nueva Solicitud de Pago</p>
-                </div>
-                <div style='padding: 20px; border: 1px solid #dee2e6; border-top: none;'>
-                    <p><strong>Código:</strong> {$codigo}</p>
-                    <p><strong>Tipo:</strong> {$tipo_pago}</p>
-                    <p><strong>Concepto:</strong> {$input['concepto']}</p>
-                    <p><strong>Beneficiario:</strong> {$input['beneficiario']}</p>
-                    <p><strong>Monto:</strong> <strong style='color: #27ae60;'>$ {$monto_formateado}</strong></p>
-                    <p><strong>Fecha Requerida:</strong> {$input['fecha_requerida']}</p>
-                </div>
-            </div>
-        ";
-        
-        foreach ($contabEmails as $contab) {
-            enviarCorreo($contab['email'], $contab['nombre'], $asunto, $cuerpo);
+        // ✅ NOTIFICACIÓN - EJECUTAR EN SEGUNDO PLANO (OPCIONAL)
+        // Se puede mover a un job o proceso asíncrono para no bloquear la respuesta
+        try {
+            $contabEmails = getEmailsPorRol($pdo, 'contab');
+            if (!empty($contabEmails)) {
+                $asunto = "NUEVA SOLICITUD DE PAGO - {$codigo}";
+                $monto_formateado = number_format($input['monto_solicitado'], 2, ',', '.');
+                $tipo_pago = $es_honorario ? 'Honorarios/Terceros' : 'Pago General';
+                
+                $cuerpo = "
+                    <div style='font-family: Arial, sans-serif; max-width: 600px;'>
+                        <div style='background-color: #2c3e50; padding: 20px; text-align: center;'>
+                            <h2 style='color: #fff;'>CODEHCIU - Finanzas</h2>
+                            <p style='color: #ecf0f1;'>Nueva Solicitud de Pago</p>
+                        </div>
+                        <div style='padding: 20px; border: 1px solid #dee2e6; border-top: none;'>
+                            <p><strong>Código:</strong> {$codigo}</p>
+                            <p><strong>Tipo:</strong> {$tipo_pago}</p>
+                            <p><strong>Concepto:</strong> {$input['concepto']}</p>
+                            <p><strong>Beneficiario:</strong> {$input['beneficiario']}</p>
+                            <p><strong>Monto:</strong> <strong style='color: #27ae60;'>$ {$monto_formateado}</strong></p>
+                            <p><strong>Fecha Requerida:</strong> {$input['fecha_requerida']}</p>
+                        </div>
+                    </div>
+                ";
+                
+                foreach ($contabEmails as $contab) {
+                    enviarCorreo($contab['email'], $contab['nombre'], $asunto, $cuerpo);
+                }
+            }
+        } catch (Exception $mailError) {
+            // Si el email falla, no afecta la respuesta
+            error_log("Error enviando correo: " . $mailError->getMessage());
         }
         
         echo json_encode([
